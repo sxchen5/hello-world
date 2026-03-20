@@ -24,162 +24,83 @@ body{
   background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;
 }
 .container{max-width:1280px;margin:0 auto;padding:20px}
-
 .header{text-align:center;padding:28px 0 20px}
 .header h1{font-size:1.5rem;font-weight:700;color:var(--primary);margin-bottom:2px}
 .header .subtitle{color:var(--text-sec);font-size:.88rem}
-
 .card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
 .card-title{font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .card-title .badge{font-size:.75rem;font-weight:400;color:var(--text-sec);margin-left:auto}
-
 .form-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px}
 .form-group{display:flex;align-items:center;gap:8px}
 .form-group label{font-weight:500;white-space:nowrap;color:var(--text-sec);font-size:.88rem}
-.form-group input{
-  padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);
-  font-size:.88rem;outline:none;transition:border-color .2s;width:140px;
-}
+.form-group input{padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:.88rem;outline:none;transition:border-color .2s;width:140px}
 .form-group input:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-
-.upload-area{
-  border:2px dashed var(--border);border-radius:var(--radius);padding:36px 20px;
-  text-align:center;cursor:pointer;transition:all .3s;background:var(--primary-bg);position:relative;
-}
+.upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:36px 20px;text-align:center;cursor:pointer;transition:all .3s;background:var(--primary-bg);position:relative}
 .upload-area:hover,.upload-area.dragover{border-color:var(--primary-light);background:#dbeafe}
 .upload-area .upload-icon{font-size:2.8rem;margin-bottom:10px;display:block}
 .upload-area .upload-text{font-size:1rem;font-weight:500;margin-bottom:4px}
 .upload-area .upload-hint{color:var(--text-sec);font-size:.82rem}
 .upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
-
 .progress-container{margin-top:16px}
-.progress-item{
-  margin-bottom:10px;padding:10px 14px;background:#f9fafb;
-  border-radius:var(--radius);border:1px solid #e5e7eb;
-}
-.progress-item .phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.progress-item .fname{font-weight:500;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
-.progress-item .pstatus{font-size:.78rem;color:var(--text-sec)}
+.progress-item{margin-bottom:10px;padding:10px 14px;background:#f9fafb;border-radius:var(--radius);border:1px solid #e5e7eb}
+.progress-item .phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px}
+.progress-item .fname{font-weight:500;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.progress-item .pstatus{font-size:.78rem;color:var(--text-sec);white-space:nowrap}
 .progress-item .pstatus.done{color:var(--success)}
 .progress-item .pstatus.error{color:var(--danger)}
+.progress-item .pdel{background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:.9rem;padding:0 4px;line-height:1}
+.progress-item .pdel:hover{color:var(--danger)}
 .pbar{height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden}
 .pbar .fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:3px;transition:width .3s;width:0%}
-
 .table-wrapper{overflow-x:auto;margin-top:4px;max-height:60vh;overflow-y:auto}
 table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:1000px}
 thead{position:sticky;top:0;z-index:2}
-thead th{
-  background:#f3f4f6;padding:8px 4px;text-align:center;font-weight:600;
-  border:1px solid var(--border);white-space:nowrap;
-}
+thead th{background:#f3f4f6;padding:8px 4px;text-align:center;font-weight:600;border:1px solid var(--border);white-space:nowrap}
 tbody td{padding:2px;border:1px solid var(--border);text-align:center;vertical-align:middle}
 tbody tr:nth-child(even){background:#fafbfc}
 tbody tr:hover{background:#f0f7ff}
 tbody td.seq{width:36px;color:var(--text-sec);font-weight:500;padding:4px}
-tbody td input{
-  width:100%;padding:4px 5px;border:1px solid transparent;border-radius:3px;
-  font-size:.82rem;text-align:center;background:transparent;outline:none;transition:all .2s;
-}
+tbody td input{width:100%;padding:4px 5px;border:1px solid transparent;border-radius:3px;font-size:.82rem;text-align:center;background:transparent;outline:none;transition:all .2s}
 tbody td input:hover{border-color:#e5e7eb}
 tbody td input:focus{border-color:var(--primary-light);background:var(--surface);box-shadow:0 0 0 2px rgba(59,130,246,.1)}
 tbody td input.wide{min-width:140px}
-tbody td select{
-  width:100%;padding:4px 2px;border:1px solid transparent;border-radius:3px;
-  font-size:.82rem;text-align:center;background:transparent;outline:none;cursor:pointer;
-  -webkit-appearance:none;appearance:none;
-}
+tbody td select{width:100%;padding:4px 2px;border:1px solid transparent;border-radius:3px;font-size:.82rem;text-align:center;background:transparent;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none}
 tbody td select:focus{border-color:var(--primary-light);background:var(--surface)}
-
-.btn{
-  display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;
-  border-radius:var(--radius);font-size:.88rem;font-weight:500;cursor:pointer;transition:all .2s;
-}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:#1e40af}
-.btn-primary:disabled{background:#93c5fd;cursor:not-allowed}
-.btn-success{background:var(--success);color:#fff}
-.btn-success:hover{background:#047857}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:var(--radius);font-size:.88rem;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:#1e40af}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#047857}
 .btn-success:disabled{background:#6ee7b7;cursor:not-allowed}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn-outline:hover{background:#f9fafb;border-color:#9ca3af}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{background:#f9fafb}
 .btn-sm{padding:4px 10px;font-size:.78rem}
-.btn-del{background:transparent;color:var(--danger);padding:4px 8px;font-size:.78rem;border:1px solid transparent}
-.btn-del:hover{background:#fef2f2;border-color:#fecaca}
-
+.btn-del{background:transparent;color:var(--danger);padding:4px 8px;font-size:.78rem;border:1px solid transparent}.btn-del:hover{background:#fef2f2;border-color:#fecaca}
 .actions{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;align-items:center}
-
 .empty-state{text-align:center;padding:36px 20px;color:var(--text-sec)}
 .empty-state .eicon{font-size:2.2rem;margin-bottom:8px;display:block;opacity:.5}
-
-.toast{
-  position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:var(--radius);
-  color:#fff;font-size:.88rem;z-index:9999;transform:translateX(120%);transition:transform .3s;
-  box-shadow:var(--shadow-lg);
-}
-.toast.show{transform:translateX(0)}
-.toast.success{background:var(--success)}
-.toast.error{background:var(--danger)}
-.toast.info{background:var(--primary)}
-
-.ocr-text-toggle{
-  margin-top:8px;font-size:.78rem;color:var(--primary);cursor:pointer;
-  display:inline-block;user-select:none;
-}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:var(--radius);color:#fff;font-size:.88rem;z-index:9999;transform:translateX(120%);transition:transform .3s;box-shadow:var(--shadow-lg)}
+.toast.show{transform:translateX(0)}.toast.success{background:var(--success)}.toast.error{background:var(--danger)}.toast.info{background:var(--primary)}
+.ocr-text-toggle{margin-top:8px;font-size:.78rem;color:var(--primary);cursor:pointer;display:inline-block;user-select:none}
 .ocr-text-toggle:hover{text-decoration:underline}
-.ocr-text-box{
-  display:none;margin-top:6px;padding:10px;background:#f9fafb;border:1px solid #e5e7eb;
-  border-radius:var(--radius);font-size:.75rem;color:var(--text-sec);
-  white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;
-  font-family:'Courier New',monospace;
-}
+.ocr-text-box{display:none;margin-top:6px;padding:10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:var(--radius);font-size:.75rem;color:var(--text-sec);white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;font-family:'Courier New',monospace}
 .ocr-text-box.visible{display:block}
-
-@media(max-width:640px){
-  .container{padding:12px}
-  .header h1{font-size:1.15rem}
-  .form-row{flex-direction:column;gap:8px}
-  .form-group{flex:1}
-  .form-group input{width:100%;flex:1}
-  .upload-area{padding:24px 16px}
-  .actions{flex-direction:column}
-  .btn{justify-content:center;width:100%}
-}
+@media(max-width:640px){.container{padding:12px}.header h1{font-size:1.15rem}.form-row{flex-direction:column;gap:8px}.form-group{flex:1}.form-group input{width:100%;flex:1}.upload-area{padding:24px 16px}.actions{flex-direction:column}.btn{justify-content:center;width:100%}}
 </style>
 </head>
 <body>
-
 <div class="container">
   <div class="header">
     <h1>锡彭市政建设（江苏）有限公司</h1>
     <div class="subtitle">发票识别与移交表生成系统</div>
   </div>
-
   <div class="card">
     <div class="card-title">📋 基本信息</div>
     <div class="form-row">
-      <div class="form-group">
-        <label>编号：</label>
-        <input type="text" id="docNumber" placeholder="请输入编号">
-      </div>
-      <div class="form-group">
-        <label>移交日期：</label>
-        <input type="date" id="defaultTransferDate">
-      </div>
-      <div class="form-group">
-        <label>移交人：</label>
-        <input type="text" id="transferPerson" placeholder="移交人姓名">
-      </div>
-      <div class="form-group">
-        <label>接收人：</label>
-        <input type="text" id="receiverPerson" placeholder="接收人姓名">
-      </div>
-      <div class="form-group">
-        <label>监督人：</label>
-        <input type="text" id="supervisorPerson" placeholder="监督人姓名">
-      </div>
+      <div class="form-group"><label>编号：</label><input type="text" id="docNumber" placeholder="请输入编号"></div>
+      <div class="form-group"><label>移交日期：</label><input type="date" id="defaultTransferDate"></div>
+      <div class="form-group"><label>移交人：</label><input type="text" id="transferPerson" placeholder="移交人姓名"></div>
+      <div class="form-group"><label>接收人：</label><input type="text" id="receiverPerson" placeholder="接收人姓名"></div>
+      <div class="form-group"><label>监督人：</label><input type="text" id="supervisorPerson" placeholder="监督人姓名"></div>
     </div>
   </div>
-
   <div class="card">
     <div class="card-title">📄 上传发票</div>
     <div class="upload-area" id="uploadArea">
@@ -190,717 +111,491 @@ tbody td select:focus{border-color:var(--primary-light);background:var(--surface
     </div>
     <div class="progress-container" id="progressContainer"></div>
   </div>
-
   <div class="card">
-    <div class="card-title">
-      📊 发票数据
-      <span class="badge" id="rowCount"></span>
-    </div>
-    <div id="tableArea">
-      <div class="empty-state" id="emptyState">
-        <span class="eicon">📭</span>
-        <div>暂无数据，请上传发票文件或手动添加</div>
-      </div>
-    </div>
+    <div class="card-title">📊 发票数据<span class="badge" id="rowCount"></span></div>
+    <div id="tableArea"><div class="empty-state" id="emptyState"><span class="eicon">📭</span><div>暂无数据，请上传发票文件或手动添加</div></div></div>
     <div class="actions" id="tableActions" style="display:none">
       <button class="btn btn-outline btn-sm" onclick="addEmptyRow()">＋ 添加空行</button>
       <button class="btn btn-outline btn-sm" onclick="applyCommonFields()">应用基本信息到所有行</button>
       <span style="flex:1"></span>
-      <button class="btn btn-del btn-sm" onclick="clearAllRows()">清空全部</button>
+      <button class="btn btn-del btn-sm" onclick="clearAll()" style="border:1px solid var(--border)">🗑 一键清空所有数据和文件</button>
     </div>
   </div>
-
   <div class="card" style="text-align:center;padding:24px">
-    <button class="btn btn-success" id="exportBtn" onclick="exportExcel()" disabled style="padding:12px 36px;font-size:1rem">
-      📥 导出 Excel 表格
-    </button>
+    <button class="btn btn-success" id="exportBtn" onclick="exportExcel()" disabled style="padding:12px 36px;font-size:1rem">📥 导出 Excel 表格</button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-const state = { rows: [], worker: null, processing: false, cancelled: false };
-let _progressCb = null;
+const LS_ROWS='inv_rows',LS_FORM='inv_form',LS_FILES='inv_files';
+const state={rows:[],worker:null,processing:false,cancelled:false};
+let _progressCb=null;
 
-const $file = document.getElementById('fileInput');
-const $upload = document.getElementById('uploadArea');
-const $progress = document.getElementById('progressContainer');
-const $tableArea = document.getElementById('tableArea');
-const $empty = document.getElementById('emptyState');
-const $actions = document.getElementById('tableActions');
-const $exportBtn = document.getElementById('exportBtn');
-const $rowCount = document.getElementById('rowCount');
-const $dateInput = document.getElementById('defaultTransferDate');
+const $file=document.getElementById('fileInput'),$upload=document.getElementById('uploadArea'),
+  $progress=document.getElementById('progressContainer'),$tableArea=document.getElementById('tableArea'),
+  $empty=document.getElementById('emptyState'),$actions=document.getElementById('tableActions'),
+  $exportBtn=document.getElementById('exportBtn'),$rowCount=document.getElementById('rowCount'),
+  $dateInput=document.getElementById('defaultTransferDate');
 
-const today = new Date();
-$dateInput.value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+// --- localStorage persistence ---
+function saveRows(){try{localStorage.setItem(LS_ROWS,JSON.stringify(state.rows))}catch(e){}}
+function loadRows(){try{const d=localStorage.getItem(LS_ROWS);if(d){state.rows=JSON.parse(d)}}catch(e){}}
+function saveForm(){
+  try{localStorage.setItem(LS_FORM,JSON.stringify({
+    docNumber:document.getElementById('docNumber').value,
+    transferDate:$dateInput.value,
+    transferPerson:document.getElementById('transferPerson').value,
+    receiver:document.getElementById('receiverPerson').value,
+    supervisor:document.getElementById('supervisorPerson').value
+  }))}catch(e){}
+}
+function loadForm(){
+  try{const d=JSON.parse(localStorage.getItem(LS_FORM));if(!d)return;
+    if(d.docNumber)document.getElementById('docNumber').value=d.docNumber;
+    if(d.transferDate)$dateInput.value=d.transferDate;
+    if(d.transferPerson)document.getElementById('transferPerson').value=d.transferPerson;
+    if(d.receiver)document.getElementById('receiverPerson').value=d.receiver;
+    if(d.supervisor)document.getElementById('supervisorPerson').value=d.supervisor;
+  }catch(e){}}
+function saveFileHistory(){
+  try{const items=[];$progress.querySelectorAll('.progress-item').forEach(el=>{
+    const n=el.querySelector('.fname')?.textContent||'';
+    const s=el.querySelector('.pstatus')?.textContent||'';
+    const t=el.querySelector('.ocr-text-box')?.textContent||'';
+    items.push({name:n,status:s,text:t});
+  });localStorage.setItem(LS_FILES,JSON.stringify(items))}catch(e){}
+}
+function loadFileHistory(){
+  try{const d=JSON.parse(localStorage.getItem(LS_FILES));if(!d||!d.length)return;
+    d.forEach(f=>{const pi=mkProgress(f.name);pi.el.querySelector('.pstatus').textContent=f.status;
+      pi.el.querySelector('.fill').style.width='100%';if(f.text)pi.addOcrText(f.text);$progress.appendChild(pi.el)});
+  }catch(e){}}
 
-$upload.addEventListener('dragover', e => { e.preventDefault(); $upload.classList.add('dragover'); });
-$upload.addEventListener('dragleave', () => $upload.classList.remove('dragover'));
-$upload.addEventListener('drop', e => {
-  e.preventDefault();
-  $upload.classList.remove('dragover');
-  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
-});
-$file.addEventListener('change', e => {
-  if (e.target.files.length) handleFiles(e.target.files);
-  e.target.value = '';
-});
+['docNumber','transferPerson','receiverPerson','supervisorPerson'].forEach(id=>
+  document.getElementById(id).addEventListener('input',saveForm));
+$dateInput.addEventListener('change',saveForm);
 
-function errMsg(err) { return (err && err.message) ? err.message : String(err || '未知错误'); }
+// --- Init ---
+const today=new Date();
+$dateInput.value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+loadForm();loadRows();renderTable();loadFileHistory();
+if(!$dateInput.value)$dateInput.value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
-async function getWorker() {
-  if (!state.worker) {
-    state.worker = await Tesseract.createWorker('chi_sim+eng', 1, {
-      logger: m => { if (_progressCb && m.progress !== undefined) _progressCb(m.status, m.progress); }
+// --- Upload ---
+$upload.addEventListener('dragover',e=>{e.preventDefault();$upload.classList.add('dragover')});
+$upload.addEventListener('dragleave',()=>$upload.classList.remove('dragover'));
+$upload.addEventListener('drop',e=>{e.preventDefault();$upload.classList.remove('dragover');if(e.dataTransfer.files.length)handleFiles(e.dataTransfer.files)});
+$file.addEventListener('change',e=>{if(e.target.files.length)handleFiles(e.target.files);e.target.value=''});
+
+function errMsg(e){return(e&&e.message)?e.message:String(e||'未知错误')}
+
+async function getWorker(){
+  if(!state.worker){
+    state.worker=await Tesseract.createWorker('chi_sim+eng',1,{
+      logger:m=>{if(_progressCb&&m.progress!==undefined)_progressCb(m.status,m.progress)}
     });
   }
   return state.worker;
 }
-
-async function cancelProcessing() {
-  state.cancelled = true;
-  if (state.worker) {
-    try { await state.worker.terminate(); } catch (_) {}
-    state.worker = null;
-  }
-  state.processing = false;
-  showToast('已取消处理', 'info');
+async function cancelProcessing(){
+  state.cancelled=true;
+  if(state.worker){try{await state.worker.terminate()}catch(e){}state.worker=null}
+  state.processing=false;showToast('已取消处理','info');
 }
 
-async function handleFiles(fileList) {
-  if (state.processing) { showToast('正在处理中，请稍候', 'info'); return; }
-  state.processing = true;
-  state.cancelled = false;
-  const files = Array.from(fileList).filter(f =>
-    f.type === 'application/pdf' || f.type.startsWith('image/')
-  );
-  if (!files.length) { showToast('未选择有效文件', 'error'); state.processing = false; return; }
-
-  const cancelBtn = document.createElement('button');
-  cancelBtn.className = 'btn btn-del btn-sm';
-  cancelBtn.style.cssText = 'margin-top:10px;display:block;border:1px solid var(--border)';
-  cancelBtn.textContent = '✕ 取消处理';
-  cancelBtn.onclick = cancelProcessing;
-  $progress.appendChild(cancelBtn);
-
-  try {
-    for (const file of files) {
-      if (state.cancelled) break;
-      const pi = mkProgress(file.name);
-      $progress.insertBefore(pi.el, cancelBtn);
-      try {
-        if (file.type === 'application/pdf') await processPDF(file, pi);
-        else await processImage(file, pi);
-        if (!state.cancelled) pi.done();
-      } catch (err) {
-        console.error('处理文件失败:', file.name, err);
-        pi.fail(errMsg(err));
-      }
+async function handleFiles(fileList){
+  if(state.processing){showToast('正在处理中','info');return}
+  state.processing=true;state.cancelled=false;
+  const files=Array.from(fileList).filter(f=>f.type==='application/pdf'||f.type.startsWith('image/'));
+  if(!files.length){showToast('未选择有效文件','error');state.processing=false;return}
+  const cancelBtn=document.createElement('button');
+  cancelBtn.className='btn btn-del btn-sm';cancelBtn.style.cssText='margin-top:10px;display:block;border:1px solid var(--border)';
+  cancelBtn.textContent='✕ 取消处理';cancelBtn.onclick=cancelProcessing;$progress.appendChild(cancelBtn);
+  try{
+    for(const file of files){
+      if(state.cancelled)break;
+      const pi=mkProgress(file.name);$progress.insertBefore(pi.el,cancelBtn);
+      try{
+        if(file.type==='application/pdf')await processPDF(file,pi);
+        else await processImage(file,pi);
+        if(!state.cancelled)pi.done();
+      }catch(err){console.error(err);pi.fail(errMsg(err))}
+      saveFileHistory();
     }
-  } finally {
-    state.processing = false;
-    _progressCb = null;
-    cancelBtn.remove();
-    if (!state.cancelled) showToast(`处理完成，共 ${state.rows.length} 条`, 'success');
-  }
+  }finally{state.processing=false;_progressCb=null;cancelBtn.remove();
+    if(!state.cancelled)showToast(`处理完成，共 ${state.rows.length} 条`,'success');saveRows();saveFileHistory()}
 }
 
-function mkProgress(name) {
-  const el = document.createElement('div');
-  el.className = 'progress-item';
-  el.innerHTML = `<div class="phead"><span class="fname">${esc(name)}</span><span class="pstatus">准备中...</span></div><div class="pbar"><div class="fill"></div></div>`;
-  const fill = el.querySelector('.fill');
-  const st = el.querySelector('.pstatus');
-  return {
-    el,
-    p(pct) { fill.style.width = Math.min(100, Math.round(pct)) + '%'; },
-    s(txt) { st.textContent = txt; st.className = 'pstatus'; },
-    done() { st.textContent = '✓ 完成'; st.className = 'pstatus done'; fill.style.width = '100%'; },
-    fail(msg) { st.textContent = '✗ ' + (msg || '处理失败'); st.className = 'pstatus error'; },
-    addOcrText(text) {
-      const toggle = document.createElement('span');
-      toggle.className = 'ocr-text-toggle';
-      toggle.textContent = '▶ 查看识别原文';
-      const box = document.createElement('div');
-      box.className = 'ocr-text-box';
-      box.textContent = text;
-      toggle.onclick = () => {
-        const vis = box.classList.toggle('visible');
-        toggle.textContent = vis ? '▼ 收起识别原文' : '▶ 查看识别原文';
-      };
-      el.appendChild(toggle);
-      el.appendChild(box);
+function mkProgress(name){
+  const el=document.createElement('div');el.className='progress-item';
+  el.innerHTML=`<div class="phead"><span class="fname">${esc(name)}</span><span class="pstatus">准备中...</span><button class="pdel" title="删除此记录">✕</button></div><div class="pbar"><div class="fill"></div></div>`;
+  el.querySelector('.pdel').onclick=()=>{el.remove();saveFileHistory()};
+  const fill=el.querySelector('.fill'),st=el.querySelector('.pstatus');
+  return{el,
+    p(pct){fill.style.width=Math.min(100,Math.round(pct))+'%'},
+    s(txt){st.textContent=txt;st.className='pstatus'},
+    done(){st.textContent='✓ 完成';st.className='pstatus done';fill.style.width='100%'},
+    fail(msg){st.textContent='✗ '+(msg||'处理失败');st.className='pstatus error'},
+    addOcrText(text){
+      const toggle=document.createElement('span');toggle.className='ocr-text-toggle';toggle.textContent='▶ 查看识别原文';
+      const box=document.createElement('div');box.className='ocr-text-box';box.textContent=text;
+      toggle.onclick=()=>{const v=box.classList.toggle('visible');toggle.textContent=v?'▼ 收起识别原文':'▶ 查看识别原文'};
+      el.appendChild(toggle);el.appendChild(box);
     }
   };
 }
 
-async function processPDF(file, pi) {
-  pi.s('解析 PDF...');
-  pi.p(5);
-  const buf = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  const total = pdf.numPages;
+// --- PDF Text Extraction ---
+async function extractPdfText(page){
+  const tc=await page.getTextContent();
+  const items=tc.items.filter(it=>it.str&&it.str.trim());
+  if(!items.length)return '';
+  items.sort((a,b)=>{
+    const ay=-a.transform[5],by=-b.transform[5];
+    if(Math.abs(ay-by)<5)return a.transform[4]-b.transform[4];
+    return ay-by;
+  });
+  const groups=[];let cur=[items[0]];
+  for(let k=1;k<items.length;k++){
+    if(Math.abs(-items[k].transform[5]-(-cur[0].transform[5]))<5)cur.push(items[k]);
+    else{groups.push(cur);cur=[items[k]]}
+  }
+  groups.push(cur);
+  return groups.map(g=>{g.sort((a,b)=>a.transform[4]-b.transform[4]);return g.map(it=>it.str).join(' ')}).join('\n');
+}
 
-  for (let i = 1; i <= total; i++) {
-    if (state.cancelled) return;
-    pi.s(`处理第 ${i}/${total} 页...`);
-    const page = await pdf.getPage(i);
-    let text = '';
-
-    try {
-      const tc = await page.getTextContent();
-      const items = tc.items.filter(it => it.str && it.str.trim());
-      if (items.length) {
-        items.sort((a, b) => {
-          const ay = -a.transform[5], by = -b.transform[5];
-          if (Math.abs(ay - by) < 5) return a.transform[4] - b.transform[4];
-          return ay - by;
-        });
-        const groups = []; let cur = [items[0]];
-        for (let k = 1; k < items.length; k++) {
-          if (Math.abs(-items[k].transform[5] - (-cur[0].transform[5])) < 5) cur.push(items[k]);
-          else { groups.push(cur); cur = [items[k]]; }
-        }
-        groups.push(cur);
-        text = groups.map(g => {
-          g.sort((a, b) => a.transform[4] - b.transform[4]);
-          return g.map(it => it.str).join(' ');
-        }).join('\n');
-      }
-    } catch (e) { console.warn('PDF文本提取失败:', e); }
-
-    if (text.replace(/\s/g, '').length < 30) {
-      if (state.cancelled) return;
-      pi.s(`第 ${i}/${total} 页 OCR 识别中...`);
-      const vp = page.getViewport({ scale: 3.0 });
-      const cvs = document.createElement('canvas');
-      cvs.width = vp.width; cvs.height = vp.height;
-      const ctx = cvs.getContext('2d');
-      await page.render({ canvasContext: ctx, viewport: vp }).promise;
-      ctx.filter = 'contrast(1.3)';
-      ctx.drawImage(cvs, 0, 0);
-      _progressCb = (status, prog) => {
-        pi.s(`第 ${i}/${total} 页: ${trStatus(status)}`);
-        pi.p(5 + ((i - 1) / total) * 90 + (90 / total) * prog);
-      };
-      const w = await getWorker();
-      const res = await w.recognize(cvs);
-      text = res.data.text;
+async function processPDF(file,pi){
+  pi.s('解析 PDF...');pi.p(5);
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  for(let i=1;i<=pdf.numPages;i++){
+    if(state.cancelled)return;
+    pi.s(`处理第 ${i}/${pdf.numPages} 页...`);
+    const page=await pdf.getPage(i);
+    let text='';
+    try{text=await extractPdfText(page)}catch(e){console.warn(e)}
+    if(text.replace(/\s/g,'').length<30){
+      if(state.cancelled)return;
+      pi.s(`第 ${i}/${pdf.numPages} 页 OCR 识别中...`);
+      const vp=page.getViewport({scale:3.0});
+      const cvs=document.createElement('canvas');cvs.width=vp.width;cvs.height=vp.height;
+      await page.render({canvasContext:cvs.getContext('2d'),viewport:vp}).promise;
+      _progressCb=(status,prog)=>{pi.s(`第 ${i}/${pdf.numPages} 页: ${trStatus(status)}`);pi.p(5+((i-1)/pdf.numPages)*90+(90/pdf.numPages)*prog)};
+      const w=await getWorker();const res=await w.recognize(cvs);text=res.data.text;
     }
-
-    pi.p(5 + (i / total) * 90);
-    pi.addOcrText(text);
-    if (text.trim()) {
-      state.rows.push(parseInvoice(text));
-      renderTable();
-    }
+    pi.p(5+(i/pdf.numPages)*90);pi.addOcrText(text);
+    if(text.trim()){state.rows.push(parseInvoice(text));renderTable();saveRows()}
   }
 }
 
-async function processImage(file, pi) {
-  pi.s('OCR 识别中...');
-  pi.p(5);
-  if (state.cancelled) return;
-
-  const url = URL.createObjectURL(file);
-  try {
-    _progressCb = (status, prog) => {
-      pi.s(trStatus(status));
-      pi.p(5 + prog * 90);
-    };
-    const w = await getWorker();
-    if (state.cancelled) { URL.revokeObjectURL(url); return; }
-    const res = await w.recognize(url);
-    URL.revokeObjectURL(url);
-    pi.p(95);
-    const text = (res && res.data && res.data.text) ? res.data.text : '';
-    pi.addOcrText(text);
-    if (text.trim()) {
-      state.rows.push(parseInvoice(text));
-      renderTable();
-    }
-  } catch (err) {
-    URL.revokeObjectURL(url);
-    throw err;
-  }
+async function processImage(file,pi){
+  pi.s('OCR 识别中...');pi.p(5);if(state.cancelled)return;
+  const url=URL.createObjectURL(file);
+  try{
+    _progressCb=(status,prog)=>{pi.s(trStatus(status));pi.p(5+prog*90)};
+    const w=await getWorker();if(state.cancelled){URL.revokeObjectURL(url);return}
+    const res=await w.recognize(url);URL.revokeObjectURL(url);pi.p(95);
+    const text=(res&&res.data&&res.data.text)?res.data.text:'';pi.addOcrText(text);
+    if(text.trim()){state.rows.push(parseInvoice(text));renderTable();saveRows()}
+  }catch(err){URL.revokeObjectURL(url);throw err}
 }
 
-function trStatus(s) {
-  const m = {
-    'loading tesseract core': '加载 OCR 引擎...',
-    'initializing tesseract': '初始化...',
-    'loading language traineddata': '加载中文语言包（首次约25MB）...',
-    'initializing api': '初始化接口...',
-    'recognizing text': '正在识别文字...',
-  };
-  return m[s] || s;
-}
+function trStatus(s){return{'loading tesseract core':'加载OCR引擎...','initializing tesseract':'初始化...','loading language traineddata':'加载中文语言包(首次约25MB)...','initializing api':'初始化接口...','recognizing text':'正在识别文字...'}[s]||s}
 
-function parseInvoice(text) {
-  const c = text.replace(/\s+/g, ' ').trim();
-  const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
-  const ns = c.replace(/\s/g, '');
-  const slines = lines.map(l => l.replace(/\s/g, ''));
+// ===================== INVOICE PARSER =====================
+function parseInvoice(text){
+  const lines=text.split(/\n/).map(l=>l.trim()).filter(Boolean);
+  const slines=lines.map(l=>l.replace(/\s/g,''));
+  const allText=lines.join('\n');
+  const ns=allText.replace(/\s/g,'');
 
-  const SUFFIX = '(?:有限公司|有限责任公司|股份公司|公司|集团|商行|事务所|中心|服务部|经营部|工作室|研究所|研究院|药房|药店|酒店|宾馆|饭店|医院|学校|大学|银行|分公司|分行|支行|营业部|供电局|供电公司|供水公司|自来水公司|加油站|物业|百货|超市|门市部|个体户)';
-  const CJK = '[\u4e00-\u9fa5（）()\\w]';
+  // --- Collect all numbers from the entire text ---
+  const allNums=[];
+  for(const line of lines){const found=line.match(/([\d,]+\.\d{2})/g);if(found)found.forEach(n=>allNums.push(parseFloat(n.replace(/,/g,''))))}
 
-  let invoiceType = '电子普票';
-  if (/增值税电子专用发票|电子专票|专用发票/.test(ns)) invoiceType = '电子专票';
-  else if (/铁路电子客票|铁路客运/.test(ns)) invoiceType = '发票（铁路电子客票）';
-  else if (/航空运输电子客票|行程单/.test(ns)) invoiceType = '电子行程单';
-  else if (/通行费/.test(ns)) invoiceType = '通行费发票';
-  else if (/客运发票|汽车票/.test(ns)) invoiceType = '客运发票';
-  else if (/增值税普通发票|电子普通发票|普通发票/.test(ns)) invoiceType = '电子普票';
+  // --- 票据类型 ---
+  let invoiceType='电子普票';
+  if(/电子发票[（(]增值税专用发票|增值税电子专用发票|电子专票|专用发票/.test(ns))invoiceType='电子专票';
+  else if(/铁路电子客票|铁路客运/.test(ns))invoiceType='发票（铁路电子客票）';
+  else if(/航空运输电子客票|行程单/.test(ns))invoiceType='电子行程单';
+  else if(/通行费/.test(ns))invoiceType='通行费发票';
+  else if(/客运发票|汽车票/.test(ns))invoiceType='客运发票';
+  else if(/电子发票[（(]普通发票|增值税普通发票|增值税电子普通发票|电子普通发票|普通发票/.test(ns))invoiceType='电子普票';
 
-  let invoiceDate = '';
-  let dm = null;
-  for (const sl of slines) {
-    dm = sl.match(/开票日期[：:]*(\d{4})年(\d{1,2})月(\d{1,2})日?/);
-    if (dm) break;
-    dm = sl.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-    if (dm) break;
+  // --- 开票日期 ---
+  let invoiceDate='';
+  for(const sl of slines){
+    let m=sl.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+    if(m){invoiceDate=`${m[1]}/${m[2]}/${m[3]}`;break}
   }
-  if (!dm) dm = ns.match(/开票日期[：:]*(\d{4})年(\d{1,2})月(\d{1,2})日?/);
-  if (!dm) dm = ns.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-  if (!dm) dm = c.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
-  if (dm) invoiceDate = `${dm[1]}/${dm[2]}/${dm[3]}`;
-  if (!invoiceDate) { dm = ns.match(/开票日期[：:]*(\d{4})(\d{2})(\d{2})/); if (dm) invoiceDate = `${dm[1]}/${parseInt(dm[2])}/${parseInt(dm[3])}`; }
-  if (!invoiceDate) { dm = ns.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/); if (dm) invoiceDate = `${dm[1]}/${dm[2]}/${dm[3]}`; }
-  if (!invoiceDate) {
-    for (const sl of slines) {
-      dm = sl.match(/日期[：:]*(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
-      if (dm) { invoiceDate = `${dm[1]}/${parseInt(dm[2])}/${parseInt(dm[3])}`; break; }
+  if(!invoiceDate){
+    for(const line of lines){
+      let m=line.match(/(\d{4})\s+(\d{2})\s+(\d{2})/);
+      if(m&&parseInt(m[1])>=2015&&parseInt(m[1])<=2030){invoiceDate=`${m[1]}/${parseInt(m[2])}/${parseInt(m[3])}`;break}
     }
   }
+  if(!invoiceDate){
+    let m=ns.match(/开票日期[：:]*(\d{4})年(\d{1,2})月(\d{1,2})日?/);
+    if(m)invoiceDate=`${m[1]}/${m[2]}/${m[3]}`;
+  }
+  if(!invoiceDate){let m=ns.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);if(m)invoiceDate=`${m[1]}/${m[2]}/${m[3]}`}
 
-  // --- 票据号码 ---
-  let invoiceNumber = '';
-  for (const line of lines) {
-    const sl = line.replace(/\s/g, '');
-    let m = sl.match(/发票号码[：:]*(\d{4,20})/);
-    if (m) { invoiceNumber = m[1]; break; }
-    m = sl.match(/票号码[：:]*(\d{4,20})/);
-    if (m) { invoiceNumber = m[1]; break; }
+  // --- 发票号码 ---
+  let invoiceNumber='';
+  for(const sl of slines){
+    let m=sl.match(/发票号码[：:]*(\d{4,30})/);
+    if(m){invoiceNumber=m[1];break}
   }
-  if (!invoiceNumber) {
-    for (const line of lines) {
-      const sl = line.replace(/\s/g, '');
-      const m = sl.match(/号码[：:]+(\d{4,20})/);
-      if (m) { invoiceNumber = m[1]; break; }
+  if(!invoiceNumber){
+    for(const sl of slines){
+      let m=sl.match(/票号码[：:]*(\d{4,30})/);
+      if(m){invoiceNumber=m[1];break}
     }
   }
-  if (!invoiceNumber) {
-    const m = ns.match(/发票号码[：:]*(\d{4,20})/);
-    if (m) invoiceNumber = m[1];
+  if(!invoiceNumber){
+    const m=ns.match(/发票号码[：:]*(\d{4,30})/);
+    if(m)invoiceNumber=m[1];
   }
-  if (!invoiceNumber) {
-    const m = ns.match(/号码[：:]+(\d{4,20})/);
-    if (m) invoiceNumber = m[1];
-  }
-  if (!invoiceNumber) {
-    for (const line of lines) {
-      if (/号\s*码/i.test(line)) {
-        const m = line.match(/(\d{6,20})/);
-        if (m) { invoiceNumber = m[1]; break; }
-      }
+  if(!invoiceNumber){
+    for(const line of lines){
+      if(/号\s*码/.test(line)){const m=line.match(/(\d{6,30})/);if(m){invoiceNumber=m[1];break}}
     }
+  }
+  if(!invoiceNumber){
+    const digitLines=[];
+    for(const sl of slines){const m=sl.match(/^(\d{8,30})$/);if(m)digitLines.push(m[1])}
+    if(digitLines.length)invoiceNumber=digitLines[0];
   }
 
-  // --- 开票单位 (销售方/收款方) ---
-  let seller = '';
-  let sellerIdx = -1;
-  for (let i = 0; i < slines.length; i++) {
-    if (/^销售方|销售方[：:，,]|^销方|^收款[方单]/.test(slines[i])) {
-      sellerIdx = i;
-      break;
+  // --- 开票单位 (销售方) ---
+  const SUFFIX='(?:有限公司|有限责任公司|股份有限公司|股份公司|公司|集团|商行|事务所|中心|服务部|经营部|工作室|研究所|研究院|药房|药店|酒店|宾馆|饭店|医院|学校|大学|银行|分公司|分行|支行|营业部|供电局|供水公司|加油站|物业|百货|超市|门市部|餐饮)';
+  let seller='';
+  let sellerZone=false;
+  const nameEntries=[];
+
+  for(let i=0;i<slines.length;i++){
+    const sl=slines[i];
+    if(/^销售方|销售方[：:（(]|^销方|^收款[方单]|售方信息/.test(sl))sellerZone=true;
+    if(sellerZone||/^购买方|购买方[：:（(]|^购方|买方信息/.test(sl)){
+      const isSeller=sellerZone&&!/购买方|购方|买方/.test(sl);
+      const re=new RegExp('名称[：:]([\\u4e00-\\u9fa5（）()\\w]{3,50}'+SUFFIX+')');
+      let m=sl.match(re);
+      if(!m)m=sl.match(/名称[：:]([\u4e00-\u9fa5（）()\w]{3,50})/);
+      if(m)nameEntries.push({name:m[1],isSeller,idx:i});
     }
   }
-  if (sellerIdx >= 0) {
-    for (let j = sellerIdx; j < Math.min(sellerIdx + 8, slines.length); j++) {
-      const sl = slines[j];
-      const re = new RegExp('名称[：:](' + CJK + '{2,}' + SUFFIX + ')');
-      let m = sl.match(re);
-      if (m) { seller = m[1]; break; }
-      m = sl.match(new RegExp('名称[：:](' + CJK + '{3,40})'));
-      if (m) { seller = m[1]; break; }
-    }
-    if (!seller) {
-      const sl = slines[sellerIdx];
-      const re = new RegExp('(?:销售方|收款[方单]位?)[：:，,]?名?称?[：:]?(' + CJK + '{3,}' + SUFFIX + ')');
-      const m = sl.match(re);
-      if (m) seller = m[1];
-    }
+
+  if(nameEntries.length>=2){
+    const sellerEntry=nameEntries.find(e=>e.isSeller)||nameEntries[nameEntries.length-1];
+    seller=sellerEntry.name;
+  }else if(nameEntries.length===1){
+    seller=nameEntries[0].name;
   }
-  if (!seller) {
-    const re1 = new RegExp('销售方[，,]?名称[：:](' + CJK + '{2,}' + SUFFIX + ')');
-    const re2 = new RegExp('销售方[，,]?名称[：:](' + CJK + '{3,40})');
-    let m = ns.match(re1); if (m) seller = m[1];
-    if (!seller) { m = ns.match(re2); if (m) seller = m[1]; }
+
+  if(!seller){
+    const re=new RegExp('名称[：:]([\\u4e00-\\u9fa5（）()\\w]{3,}'+SUFFIX+')');
+    const all=[];
+    for(const sl of slines){const m=sl.match(re);if(m)all.push(m[1])}
+    if(all.length>=2)seller=all[all.length-1];
+    else if(all.length===1)seller=all[0];
   }
-  if (!seller) {
-    const nameMatches = [];
-    for (let i = 0; i < slines.length; i++) {
-      const re = new RegExp('名称[：:](' + CJK + '{2,}' + SUFFIX + ')');
-      const m = slines[i].match(re);
-      if (m) nameMatches.push({ idx: i, name: m[1], line: slines[i] });
+
+  if(!seller){
+    const re=new RegExp('([\\u4e00-\\u9fa5（）()]{4,}'+SUFFIX+')');
+    const companies=[];
+    for(const sl of slines){
+      if(/纳税人|识别号|地址|电话|开户行|账号|购买方|合计|价税|备注|校验|发票|日期|号码/.test(sl))continue;
+      const m=sl.match(re);if(m)companies.push(m[1]);
     }
-    if (nameMatches.length >= 2) {
-      seller = nameMatches[nameMatches.length - 1].name;
-    } else if (nameMatches.length === 1 && !/购买方|购方/.test(nameMatches[0].line)) {
-      seller = nameMatches[0].name;
-    }
-  }
-  if (!seller) {
-    const re = new RegExp('名称[：:](' + CJK + '{3,40})');
-    const all = [];
-    for (const sl of slines) { const m = sl.match(re); if (m) all.push(m[1]); }
-    if (all.length >= 2) seller = all[all.length - 1];
-    else if (all.length === 1) seller = all[0];
+    if(companies.length>=2)seller=companies[companies.length-1];
+    else if(companies.length===1)seller=companies[0];
   }
 
   // --- 开票项目 ---
-  let item = '';
-  for (const line of lines) {
-    const sl = line.replace(/\s/g, '');
-    const m = sl.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，,]+)/);
-    if (m) { item = m[2]; break; }
+  let item='';
+  for(const sl of slines){
+    let m=sl.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，,]+)/);
+    if(m){item=m[2];break}
   }
-  if (!item) {
-    for (const line of lines) {
-      const sl = line.replace(/\s/g, '');
-      if (/[*＊]/.test(sl)) {
-        const m2 = sl.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]/);
-        if (m2) { item = m2[1]; break; }
-        const m3 = sl.match(/[*＊]([\u4e00-\u9fa5]{2,})/);
-        if (m3) { item = m3[1]; break; }
+  if(!item){for(const sl of slines){let m=sl.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]/);if(m){item=m[1];break}}}
+  if(!item){
+    const m=ns.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，,]+)/);
+    if(m)item=m[2];
+  }
+  if(!item){const m=ns.match(/[*＊]([\u4e00-\u9fa5]{2,})[*＊]/);if(m)item=m[1]}
+  if(!item){
+    const svcs=[/收派服务费?/,/收寄服务费?/,/电信服务/,/基础电信服务/,/住宿服务/,/住宿费/,/餐饮服务/,/餐[饮费]/,/建筑服务/,/交通运输/,/信息技术服务/,/物流辅助/,/鉴证咨询/,/现代服务/,/生活服务/,/施工费/,/工程[款费]/,/咨询费/,/设计费/,/监理费/,/劳务费/,/运输费/,/办公用品/,/材料费/,/租赁费/,/维修费/,/物业费/,/停车费/,/过路费/,/通行费/,/轮渡费/,/汽油/,/柴油/,/胶合板/,/股合板/,/油漆/,/水泥/,/快递服务/,/物流服务/,/广告服务/,/服务费/,/手续费/,/保险费/];
+    for(const p of svcs){const m=ns.match(p);if(m){item=m[0];break}}
+  }
+
+  // --- 金额和税额 ---
+  let amount='',subtotal='',tax='';
+
+  // Method 1: Find 价税合计 line for total amount
+  for(const sl of slines){
+    if(/价税合计/.test(sl)){
+      let m=sl.match(/[￥¥]([\d,]+\.?\d*)/);
+      if(m){amount=m[1].replace(/,/g,'');break}
+      m=sl.match(/([\d,]+\.\d{2})/);
+      if(m){amount=m[1].replace(/,/g,'');break}
+    }
+  }
+  if(!amount){
+    const m=ns.match(/价税合计[^￥¥\d]{0,30}[￥¥]([\d,]+\.?\d*)/);
+    if(m)amount=m[1].replace(/,/g,'');
+  }
+  if(!amount){
+    const m=ns.match(/[（(]小写[）)][：:]?[￥¥]([\d,]+\.?\d*)/);
+    if(m)amount=m[1].replace(/,/g,'');
+  }
+  if(!amount){
+    const yenNums=[];
+    for(const line of lines){const found=line.match(/[￥¥]\s*([\d,]+\.\d{2})/g);if(found)found.forEach(s=>yenNums.push(parseFloat(s.replace(/[￥¥,\s]/g,''))))}
+    if(yenNums.length)amount=String(Math.max(...yenNums));
+  }
+
+  // Method 2: Find 合计 row for subtotal + tax
+  for(const line of lines){
+    const sl=line.replace(/\s/g,'');
+    if(/^合计/.test(sl)&&!/价税合计/.test(sl)){
+      const nums=line.match(/([\d,]+\.\d{2})/g);
+      if(nums&&nums.length>=2){subtotal=nums[0].replace(/,/g,'');tax=nums[nums.length-1].replace(/,/g,'');break}
+      else if(nums&&nums.length===1){subtotal=nums[0].replace(/,/g,'');break}
+    }
+  }
+  // Also try stripped lines
+  if(!tax){
+    for(const sl of slines){
+      if(/^合计/.test(sl)&&!/价税合计/.test(sl)){
+        const nums=sl.match(/([\d,]+\.\d{2})/g);
+        if(nums&&nums.length>=2){subtotal=nums[0].replace(/,/g,'');tax=nums[nums.length-1].replace(/,/g,'');break}
       }
     }
   }
-  if (!item) {
-    const m = ns.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，,]+)/);
-    if (m) item = m[2];
+
+  // Method 3: Look for ¥ amounts on separate lines for subtotal and tax
+  if(!subtotal||!tax){
+    const yenLines=[];
+    for(const line of lines){
+      const m=line.match(/^[￥¥]\s*([\d,]+\.\d{2})$/);
+      if(m)yenLines.push(m[1].replace(/,/g,''));
+    }
+    for(const sl of slines){
+      const m=sl.match(/^[￥¥]([\d,]+\.\d{2})$/);
+      if(m&&!yenLines.includes(m[1].replace(/,/g,'')))yenLines.push(m[1].replace(/,/g,''));
+    }
+    if(yenLines.length>=2&&!subtotal){subtotal=yenLines[0];if(!tax)tax=yenLines[1]}
   }
-  if (!item) {
-    const m = ns.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]/);
-    if (m) item = m[1];
+
+  // Cross-validate: amount should equal subtotal + tax
+  if(subtotal&&tax&&!amount){amount=(parseFloat(subtotal)+parseFloat(tax)).toFixed(2)}
+  if(subtotal&&amount&&!tax){const d=parseFloat(amount)-parseFloat(subtotal);if(d>0&&d<parseFloat(amount)*0.5)tax=d.toFixed(2)}
+  if(subtotal&&tax&&amount){
+    const expected=(parseFloat(subtotal)+parseFloat(tax)).toFixed(2);
+    if(Math.abs(parseFloat(expected)-parseFloat(amount))>0.1)amount=expected;
   }
-  if (!item) {
-    const svcs = [/收派服务费/,/收寄服务费/,/收派服务/,/收寄服务/,/电信服务/,/基础电信服务/,/增值电信服务/,/建筑服务/,/住宿服务/,/餐饮服务/,/交通运输服务/,/信息技术服务/,/物流辅助服务/,/鉴证咨询服务/,/现代服务/,/生活服务/,/施工费/,/工程[款费]/,/咨询费/,/设计费/,/监理费/,/劳务费/,/加工费/,/检测费/,/安装费/,/运输费/,/住宿费/,/餐饮费/,/办公用品/,/材料费/,/租赁费/,/维修费/,/修理费/,/物业费/,/水电费/,/停车费/,/过路费/,/通行费/,/代订[机火]票/,/轮渡费/,/汽油/,/柴油/,/时租/,/保温套/,/网线/,/交换[器机]/,/分路器/,/印章/,/印戳/,/胶合板/,/股合板/,/油漆/,/水泥/,/钢[材筋管]/,/[砂沙]石/,/混凝土/,/快递服务/,/物流服务/,/货运服务/,/广告服务/,/培训费/,/会议费/,/审计费/,/保险费/,/利息/,/手续费/,/中介费/,/评估费/,/测绘费/,/勘察费/,/花椒/,/酱油/,/醋/,/食用油/,/服务费/];
-    for (const p of svcs) { const m = ns.match(p); if (m) { item = m[0]; break; } }
-  }
-  if (!item) {
-    for (const line of lines) {
-      const sl = line.replace(/\s/g, '');
-      if (/货物或应税劳务|项目名称/.test(sl)) continue;
-      if (/合计|价税合计|销售方|购买方|名称|纳税人|地址|开户|备注/.test(sl)) continue;
-      const m = sl.match(/^([\u4e00-\u9fa5]{2,8}(?:费|款|服务|用品|材料))[\d￥¥]/);
-      if (m) { item = m[1]; break; }
+
+  // Method 4: Look for % pattern for tax
+  if(!tax){
+    for(const line of lines){
+      const m=line.match(/\d+\.?\d*%\s+([\d,]+\.\d{2})/);
+      if(m){tax=m[1].replace(/,/g,'');break}
     }
   }
+  if(tax==='0.00'||tax==='0')tax='';
 
-  // --- 开票金额 (价税合计) ---
-  let amount = '';
-  let subtotal = '';
-  const apm = [
-    /价税合计[（(]大写[）)][^￥¥\d]*[￥¥]([\d,]+\.?\d*)/,
-    /[（(]小写[）)][：:]?[￥¥]([\d,]+\.?\d*)/,
-    /小写[）)][：:]?[￥¥]([\d,]+\.?\d*)/,
-    /价税合计[^\d]{0,30}[￥¥]([\d,]+\.?\d*)/,
-    /价税合计[^\d]{0,30}([\d,]+\.\d{2})/
-  ];
-  for (const p of apm) { const m = ns.match(p); if (m) { amount = m[1].replace(/,/g, ''); break; } }
-  if (!amount) {
-    for (const sl of slines) {
-      if (/价税合计/.test(sl)) {
-        const m = sl.match(/[￥¥]([\d,]+\.?\d*)/);
-        if (m) { amount = m[1].replace(/,/g, ''); break; }
-        const m2 = sl.match(/([\d,]+\.\d{2})(?!%)/g);
-        if (m2) { amount = m2[m2.length - 1].replace(/,/g, ''); break; }
-      }
-    }
-  }
-  if (!amount) {
-    const m = c.match(/[￥¥]\s*([\d,]+\.\d{2})/g);
-    if (m && m.length) {
-      const nums = m.map(s => parseFloat(s.replace(/[￥¥,\s]/g, ''))).filter(n => !isNaN(n));
-      if (nums.length) amount = String(Math.max(...nums));
-    }
-  }
+  // --- Transfer date ---
+  const dateVal=$dateInput.value;
+  let transferDate='';
+  if(dateVal){const p=dateVal.split('-');transferDate=`${p[0]}/${parseInt(p[1])}/${parseInt(p[2])}`}
 
-  // --- 税额 ---
-  let tax = '';
-  for (const sl of slines) {
-    if (/^合计/.test(sl) && !/价税合计/.test(sl)) {
-      const nums = sl.match(/([\d,]+\.\d{2})/g);
-      if (nums && nums.length >= 2) {
-        subtotal = nums[0].replace(/,/g, '');
-        tax = nums[nums.length - 1].replace(/,/g, '');
-        break;
-      } else if (nums && nums.length === 1) {
-        subtotal = nums[0].replace(/,/g, '');
-        break;
-      }
-    }
-  }
-  if (!tax) {
-    for (const line of lines) {
-      const sl = line.replace(/\s/g, '');
-      if (/^合计/.test(sl) && !/价税合计/.test(sl)) {
-        const nums = line.match(/([\d,]+\.\d{2})/g);
-        if (nums && nums.length >= 2) {
-          subtotal = nums[0].replace(/,/g, '');
-          tax = nums[nums.length - 1].replace(/,/g, '');
-          break;
-        }
-      }
-    }
-  }
-  if (!tax && subtotal && amount) {
-    const diff = parseFloat(amount) - parseFloat(subtotal);
-    if (diff > 0 && diff < parseFloat(amount) * 0.5) tax = diff.toFixed(2);
-  }
-  if (!tax) {
-    const m = c.match(/\d+\.?\d*%\s+([\d,]+\.\d{2})/);
-    if (m) tax = m[1].replace(/,/g, '');
-  }
-  if (!tax) {
-    for (const sl of slines) {
-      const m = sl.match(/税额[：:][￥¥]?([\d,]+\.?\d+)/);
-      if (m && parseFloat(m[1].replace(/,/g, '')) > 0) { tax = m[1].replace(/,/g, ''); break; }
-    }
-  }
-  if (!tax && amount) {
-    const amtVal = parseFloat(amount);
-    const allNums = [];
-    for (const line of lines) {
-      const found = line.match(/([\d,]+\.\d{2})/g);
-      if (found) found.forEach(n => allNums.push(parseFloat(n.replace(/,/g, ''))));
-    }
-    const candidates = allNums.filter(v => v > 0 && v < amtVal * 0.25 && v !== amtVal);
-    if (candidates.length) tax = String(candidates[candidates.length - 1]);
-  }
-  if (tax === '0.00' || tax === '0') tax = '';
-  if (subtotal && tax && amount) {
-    const expected = (parseFloat(subtotal) + parseFloat(tax)).toFixed(2);
-    if (Math.abs(parseFloat(expected) - parseFloat(amount)) > 0.1) amount = expected;
-  }
-
-  const dateVal = $dateInput.value;
-  let transferDate = '';
-  if (dateVal) {
-    const parts = dateVal.split('-');
-    transferDate = `${parts[0]}/${parseInt(parts[1])}/${parseInt(parts[2])}`;
-  }
-
-  return {
-    invoiceType, transferDate, invoiceDate, invoiceNumber,
-    seller, item, amount, tax,
-    transferPerson: document.getElementById('transferPerson').value,
-    receiver: document.getElementById('receiverPerson').value,
-    supervisor: document.getElementById('supervisorPerson').value,
-    remark: ''
-  };
+  return{invoiceType,transferDate,invoiceDate,invoiceNumber,seller,item,amount,tax,
+    transferPerson:document.getElementById('transferPerson').value,
+    receiver:document.getElementById('receiverPerson').value,
+    supervisor:document.getElementById('supervisorPerson').value,remark:''};
 }
 
-const FIELDS = [
-  { key: 'invoiceType', label: '票据类型', type: 'select',
-    options: ['电子普票','电子专票','纸质普票','纸质专票','发票（铁路电子客票）','电子行程单','客运发票','通行费发票','其他'] },
-  { key: 'transferDate', label: '移交日期' },
-  { key: 'invoiceDate', label: '开票日期' },
-  { key: 'invoiceNumber', label: '票据号码' },
-  { key: 'seller', label: '开票单位', wide: true },
-  { key: 'item', label: '开票项目' },
-  { key: 'amount', label: '开票金额' },
-  { key: 'tax', label: '税额' },
-  { key: 'transferPerson', label: '移交人' },
-  { key: 'receiver', label: '接收人' },
-  { key: 'supervisor', label: '监督人' },
-  { key: 'remark', label: '备注' }
-];
+// ===================== TABLE =====================
+const FIELDS=[
+  {key:'invoiceType',label:'票据类型',type:'select',options:['电子普票','电子专票','纸质普票','纸质专票','发票（铁路电子客票）','电子行程单','客运发票','通行费发票','其他']},
+  {key:'transferDate',label:'移交日期'},{key:'invoiceDate',label:'开票日期'},{key:'invoiceNumber',label:'票据号码'},
+  {key:'seller',label:'开票单位',wide:true},{key:'item',label:'开票项目'},
+  {key:'amount',label:'开票金额'},{key:'tax',label:'税额'},
+  {key:'transferPerson',label:'移交人'},{key:'receiver',label:'接收人'},{key:'supervisor',label:'监督人'},{key:'remark',label:'备注'}];
 
-function renderTable() {
-  if (!state.rows.length) {
-    $empty.style.display = '';
-    $actions.style.display = 'none';
-    $exportBtn.disabled = true;
-    $rowCount.textContent = '';
-    const tw = $tableArea.querySelector('.table-wrapper');
-    if (tw) tw.remove();
-    return;
-  }
-  $empty.style.display = 'none';
-  $actions.style.display = 'flex';
-  $exportBtn.disabled = false;
-  $rowCount.textContent = `共 ${state.rows.length} 条`;
-
-  let tw = $tableArea.querySelector('.table-wrapper');
-  if (!tw) { tw = document.createElement('div'); tw.className = 'table-wrapper'; $tableArea.appendChild(tw); }
-
-  let h = '<table><thead><tr><th>序号</th>';
-  for (const f of FIELDS) h += `<th>${f.label}</th>`;
-  h += '<th>操作</th></tr></thead><tbody>';
-
-  state.rows.forEach((row, i) => {
-    h += `<tr><td class="seq">${i + 1}</td>`;
-    for (const f of FIELDS) {
-      h += '<td>';
-      if (f.type === 'select') {
-        h += `<select data-r="${i}" data-k="${f.key}" onchange="uc(this)">`;
-        for (const o of f.options) h += `<option${row[f.key] === o ? ' selected' : ''}>${esc(o)}</option>`;
-        h += '</select>';
-      } else {
-        h += `<input type="text" value="${esc(row[f.key] || '')}" data-r="${i}" data-k="${f.key}" onchange="uc(this)"${f.wide ? ' class="wide"' : ''}>`;
-      }
-      h += '</td>';
-    }
-    h += `<td><button class="btn-del" onclick="delRow(${i})">删除</button></td></tr>`;
-  });
-  h += '</tbody></table>';
-  tw.innerHTML = h;
+function renderTable(){
+  if(!state.rows.length){$empty.style.display='';$actions.style.display='none';$exportBtn.disabled=true;$rowCount.textContent='';
+    const tw=$tableArea.querySelector('.table-wrapper');if(tw)tw.remove();return}
+  $empty.style.display='none';$actions.style.display='flex';$exportBtn.disabled=false;$rowCount.textContent=`共 ${state.rows.length} 条`;
+  let tw=$tableArea.querySelector('.table-wrapper');
+  if(!tw){tw=document.createElement('div');tw.className='table-wrapper';$tableArea.appendChild(tw)}
+  let h='<table><thead><tr><th>序号</th>';
+  for(const f of FIELDS)h+=`<th>${f.label}</th>`;
+  h+='<th>操作</th></tr></thead><tbody>';
+  state.rows.forEach((row,i)=>{
+    h+=`<tr><td class="seq">${i+1}</td>`;
+    for(const f of FIELDS){h+='<td>';
+      if(f.type==='select'){h+=`<select data-r="${i}" data-k="${f.key}" onchange="uc(this)">`;for(const o of f.options)h+=`<option${row[f.key]===o?' selected':''}>${esc(o)}</option>`;h+='</select>'}
+      else h+=`<input type="text" value="${esc(row[f.key]||'')}" data-r="${i}" data-k="${f.key}" onchange="uc(this)"${f.wide?' class="wide"':''}>`
+      h+='</td>'}
+    h+=`<td><button class="btn-del" onclick="delRow(${i})">删除</button></td></tr>`});
+  h+='</tbody></table>';tw.innerHTML=h;
+}
+function uc(el){state.rows[+el.dataset.r][el.dataset.k]=el.value;saveRows()}
+function delRow(i){state.rows.splice(i,1);renderTable();saveRows()}
+function addEmptyRow(){
+  const dateVal=$dateInput.value;let td='';
+  if(dateVal){const p=dateVal.split('-');td=`${p[0]}/${parseInt(p[1])}/${parseInt(p[2])}`}
+  state.rows.push({invoiceType:'电子普票',transferDate:td,invoiceDate:'',invoiceNumber:'',seller:'',item:'',amount:'',tax:'',
+    transferPerson:document.getElementById('transferPerson').value,receiver:document.getElementById('receiverPerson').value,
+    supervisor:document.getElementById('supervisorPerson').value,remark:''});
+  renderTable();saveRows();const tw=$tableArea.querySelector('.table-wrapper');if(tw)tw.scrollTop=tw.scrollHeight;
+}
+function applyCommonFields(){
+  const tp=document.getElementById('transferPerson').value,rc=document.getElementById('receiverPerson').value,
+    sv=document.getElementById('supervisorPerson').value,dateVal=$dateInput.value;
+  let td='';if(dateVal){const p=dateVal.split('-');td=`${p[0]}/${parseInt(p[1])}/${parseInt(p[2])}`}
+  state.rows.forEach(r=>{if(tp)r.transferPerson=tp;if(rc)r.receiver=rc;if(sv)r.supervisor=sv;if(td)r.transferDate=td});
+  renderTable();saveRows();showToast('已应用基本信息到所有行','success');
+}
+function clearAll(){
+  if(!confirm('确定清空所有数据和上传记录？此操作不可恢复。'))return;
+  state.rows=[];$progress.innerHTML='';
+  localStorage.removeItem(LS_ROWS);localStorage.removeItem(LS_FILES);
+  renderTable();showToast('已清空所有数据','success');
 }
 
-function uc(el) { state.rows[+el.dataset.r][el.dataset.k] = el.value; }
-
-function delRow(i) { state.rows.splice(i, 1); renderTable(); }
-
-function addEmptyRow() {
-  const dateVal = $dateInput.value;
-  let td = '';
-  if (dateVal) { const p = dateVal.split('-'); td = `${p[0]}/${parseInt(p[1])}/${parseInt(p[2])}`; }
-  state.rows.push({
-    invoiceType: '电子普票', transferDate: td, invoiceDate: '', invoiceNumber: '',
-    seller: '', item: '', amount: '', tax: '',
-    transferPerson: document.getElementById('transferPerson').value,
-    receiver: document.getElementById('receiverPerson').value,
-    supervisor: document.getElementById('supervisorPerson').value,
-    remark: ''
-  });
-  renderTable();
-  const tw = $tableArea.querySelector('.table-wrapper');
-  if (tw) tw.scrollTop = tw.scrollHeight;
+// ===================== EXCEL EXPORT =====================
+async function exportExcel(){
+  if(!state.rows.length){showToast('没有数据可导出','error');return}
+  try{
+    const wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('发票移交表');
+    const headers=['序号','票据类型','移交日期','开票日期','票据号码','开票单位','开票项目','开票金额','税额','移交人','接收人','监督人','备注'];
+    ws.columns=[6,14,12,12,16,30,16,12,10,10,10,10,18].map(w=>({width:w}));
+    const bdr={top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}};
+    ws.mergeCells('A1','K1');const tc=ws.getCell('A1');
+    tc.value='锡彭市政建设（江苏）有限公司发票移交表';tc.font={bold:true,size:16,name:'宋体'};tc.alignment={horizontal:'center',vertical:'middle'};tc.border=bdr;
+    ws.getCell('L1').value='编号';ws.getCell('L1').font={size:10,name:'宋体'};ws.getCell('L1').alignment={horizontal:'right',vertical:'middle'};ws.getCell('L1').border=bdr;
+    ws.getCell('M1').value=document.getElementById('docNumber').value||'';ws.getCell('M1').font={size:10,name:'宋体'};ws.getCell('M1').alignment={horizontal:'left',vertical:'middle'};ws.getCell('M1').border=bdr;
+    ws.getRow(1).height=36;
+    const hr=ws.getRow(2);headers.forEach((h,i)=>{const c=hr.getCell(i+1);c.value=h;c.font={bold:true,size:10,name:'宋体'};c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF3F4F6'}};c.border=bdr});hr.height=26;
+    state.rows.forEach((row,idx)=>{const r=ws.getRow(idx+3);
+      [idx+1,row.invoiceType,row.transferDate,row.invoiceDate,row.invoiceNumber,row.seller,row.item,
+        row.amount?(isNaN(+row.amount)?row.amount:+row.amount):'',row.tax?(isNaN(+row.tax)?row.tax:+row.tax):'',
+        row.transferPerson,row.receiver,row.supervisor,row.remark
+      ].forEach((v,i)=>{const c=r.getCell(i+1);c.value=v;c.font={size:10,name:'宋体'};c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border=bdr});r.height=22});
+    const buffer=await wb.xlsx.writeBuffer();const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;const d=new Date();
+    a.download=`发票移交表_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.xlsx`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showToast('Excel 导出成功！','success');
+  }catch(err){console.error(err);showToast('导出失败: '+errMsg(err),'error')}
 }
 
-function applyCommonFields() {
-  const tp = document.getElementById('transferPerson').value;
-  const rc = document.getElementById('receiverPerson').value;
-  const sv = document.getElementById('supervisorPerson').value;
-  const dateVal = $dateInput.value;
-  let td = '';
-  if (dateVal) { const p = dateVal.split('-'); td = `${p[0]}/${parseInt(p[1])}/${parseInt(p[2])}`; }
-  state.rows.forEach(r => {
-    if (tp) r.transferPerson = tp;
-    if (rc) r.receiver = rc;
-    if (sv) r.supervisor = sv;
-    if (td) r.transferDate = td;
-  });
-  renderTable();
-  showToast('已应用基本信息到所有行', 'success');
-}
-
-function clearAllRows() {
-  if (!confirm('确定清空所有数据？')) return;
-  state.rows = [];
-  renderTable();
-}
-
-async function exportExcel() {
-  if (!state.rows.length) { showToast('没有数据可导出', 'error'); return; }
-
-  try {
-    const wb = new ExcelJS.Workbook();
-    const ws = wb.addWorksheet('发票移交表');
-
-    const headers = ['序号','票据类型','移交日期','开票日期','票据号码','开票单位','开票项目','开票金额','税额','移交人','接收人','监督人','备注'];
-    const colW = [6, 14, 12, 12, 16, 30, 16, 12, 10, 10, 10, 10, 18];
-    ws.columns = colW.map(w => ({ width: w }));
-
-    const borderThin = { top:{style:'thin'}, bottom:{style:'thin'}, left:{style:'thin'}, right:{style:'thin'} };
-
-    ws.mergeCells('A1', 'K1');
-    const tc = ws.getCell('A1');
-    tc.value = '锡彭市政建设（江苏）有限公司发票移交表';
-    tc.font = { bold: true, size: 16, name: '宋体' };
-    tc.alignment = { horizontal: 'center', vertical: 'middle' };
-    tc.border = borderThin;
-
-    ws.getCell('L1').value = '编号';
-    ws.getCell('L1').font = { size: 10, name: '宋体' };
-    ws.getCell('L1').alignment = { horizontal: 'right', vertical: 'middle' };
-    ws.getCell('L1').border = borderThin;
-
-    const docNum = document.getElementById('docNumber').value || '';
-    ws.getCell('M1').value = docNum;
-    ws.getCell('M1').font = { size: 10, name: '宋体' };
-    ws.getCell('M1').alignment = { horizontal: 'left', vertical: 'middle' };
-    ws.getCell('M1').border = borderThin;
-
-    ws.getRow(1).height = 36;
-
-    const hr = ws.getRow(2);
-    headers.forEach((h, i) => {
-      const cell = hr.getCell(i + 1);
-      cell.value = h;
-      cell.font = { bold: true, size: 10, name: '宋体' };
-      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
-      cell.border = borderThin;
-    });
-    hr.height = 26;
-
-    state.rows.forEach((row, idx) => {
-      const r = ws.getRow(idx + 3);
-      const vals = [
-        idx + 1, row.invoiceType, row.transferDate, row.invoiceDate,
-        row.invoiceNumber, row.seller, row.item,
-        row.amount ? (isNaN(+row.amount) ? row.amount : +row.amount) : '',
-        row.tax ? (isNaN(+row.tax) ? row.tax : +row.tax) : '',
-        row.transferPerson, row.receiver, row.supervisor, row.remark
-      ];
-      vals.forEach((v, i) => {
-        const cell = r.getCell(i + 1);
-        cell.value = v;
-        cell.font = { size: 10, name: '宋体' };
-        cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-        cell.border = borderThin;
-      });
-      r.height = 22;
-    });
-
-    const buffer = await wb.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const d = new Date();
-    a.download = `发票移交表_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('Excel 导出成功！', 'success');
-  } catch (err) {
-    console.error(err);
-    showToast('导出失败: ' + err.message, 'error');
-  }
-}
-
-function showToast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + type;
-  requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>t.classList.remove('show'),3000)}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 </script>
 </body>
 </html>
