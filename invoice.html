@@ -383,73 +383,111 @@ function trStatus(s) {
 function parseInvoice(text) {
   const c = text.replace(/\s+/g, ' ').trim();
   const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const ns = c.replace(/\s/g, '');
+  const slines = lines.map(l => l.replace(/\s/g, ''));
 
   let invoiceType = '电子普票';
-  if (/增值税电子专用发票|电子专票|专用发票/.test(c)) invoiceType = '电子专票';
-  else if (/铁路电子客票|铁路/.test(c)) invoiceType = '发票（铁路电子客票）';
-  else if (/机票|航空运输电子客票|行程单/.test(c)) invoiceType = '电子行程单';
-  else if (/通行费/.test(c)) invoiceType = '通行费发票';
-  else if (/客运|汽车票/.test(c)) invoiceType = '客运发票';
-  else if (/增值税普通发票|电子普通发票|普通发票/.test(c)) invoiceType = '电子普票';
+  if (/增值税电子专用发票|电子专票|专用发票/.test(ns)) invoiceType = '电子专票';
+  else if (/铁路电子客票|铁路/.test(ns)) invoiceType = '发票（铁路电子客票）';
+  else if (/机票|航空运输电子客票|行程单/.test(ns)) invoiceType = '电子行程单';
+  else if (/通行费/.test(ns)) invoiceType = '通行费发票';
+  else if (/客运|汽车票/.test(ns)) invoiceType = '客运发票';
+  else if (/增值税普通发票|电子普通发票|普通发票/.test(ns)) invoiceType = '电子普票';
 
   let invoiceDate = '';
-  let dm = c.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  let dm = ns.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  if (!dm) dm = c.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
   if (dm) invoiceDate = `${dm[1]}/${dm[2]}/${dm[3]}`;
-  else { dm = c.match(/开票日期[：:]*\s*(\d{4}[-/]\d{1,2}[-/]\d{1,2})/); if (dm) invoiceDate = dm[1].replace(/-/g, '/'); }
+  else { dm = ns.match(/开票日期[：:]*(\d{4}[-/]\d{1,2}[-/]\d{1,2})/); if (dm) invoiceDate = dm[1].replace(/-/g, '/'); }
 
   let invoiceNumber = '';
-  let nm = c.match(/发票号码[：:]*\s*[No.]*\s*(\d{8,20})/);
+  let nm = ns.match(/发票号码[：:No.]*(\d{8,20})/);
   if (nm) invoiceNumber = nm[1];
-  else { nm = c.match(/号码[：:]*\s*(\d{8,20})/); if (nm) invoiceNumber = nm[1]; }
+  else { nm = ns.match(/号码[：:No.]*(\d{8,20})/); if (nm) invoiceNumber = nm[1]; }
 
   let seller = '';
-  const sp = [
-    /销售方[：:]?\s*名\s*称[：:]?\s*([\u4e00-\u9fa5（）()a-zA-Z0-9\s]{2,40})/,
-    /销\s*售\s*方[\s\S]{0,30}?名\s*称[：:]?\s*([\u4e00-\u9fa5（）()]+)/,
-    /收款单位[：:]?\s*([\u4e00-\u9fa5（）()]+)/,
-    /销\s*方[：:]?\s*名\s*称[：:]?\s*([\u4e00-\u9fa5（）()]+)/
+  const smp = [
+    /销售方[，,]?名称[：:]([\u4e00-\u9fa5（）()]+(?:公司|集团|单位|商行|事务所|中心))/,
+    /销售方[，,]?名称[：:]([\u4e00-\u9fa5（）()]{4,40})/,
+    /销方[，,]?名称[：:]([\u4e00-\u9fa5（）()]+)/,
+    /收款单位[：:]([\u4e00-\u9fa5（）()]+)/
   ];
-  for (const p of sp) { const m = c.match(p); if (m) { seller = m[1].replace(/\s/g, '').trim(); break; } }
+  for (const p of smp) { const m = ns.match(p); if (m) { seller = m[1]; break; } }
   if (!seller) {
-    for (let i = 0; i < lines.length; i++) {
-      if (/销售方|销\s*方/.test(lines[i])) {
-        for (let j = i; j < Math.min(i + 6, lines.length); j++) {
-          const m = lines[j].match(/名\s*称[：:]?\s*([\u4e00-\u9fa5（）()\w]+)/);
-          if (m) { seller = m[1].trim(); break; }
+    for (let i = 0; i < slines.length; i++) {
+      if (/销售方|销方/.test(slines[i])) {
+        for (let j = i; j < Math.min(i + 6, slines.length); j++) {
+          const m = slines[j].match(/名称[：:]([\u4e00-\u9fa5（）()\w]+)/);
+          if (m) { seller = m[1]; break; }
         }
-        break;
+        if (seller) break;
+        const m2 = slines[i].match(/销售方[，,]?([\u4e00-\u9fa5（）()]+(?:公司|商行))/);
+        if (m2) { seller = m2[1]; break; }
       }
+    }
+  }
+  if (!seller) {
+    for (const sl of slines) {
+      const m = sl.match(/名称[：:]([\u4e00-\u9fa5（）()]{4,}(?:公司|集团|单位|商行|中心))/);
+      if (m && !/购买方|购方/.test(sl)) { seller = m[1]; break; }
     }
   }
 
   let item = '';
-  const ip = [
+  const ipm = [
     /[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，]+)/,
-    /[*＊]\s*([\u4e00-\u9fa5]+)\s*[*＊]/,
-    /项目名称[：:]?\s*([\u4e00-\u9fa5]+)/
+    /[*＊]([\u4e00-\u9fa5]+)[*＊]/
   ];
-  for (const p of ip) { const m = c.match(p); if (m) { item = (m[2] || m[1]).replace(/[*＊]/g, '').trim(); break; } }
+  for (const p of ipm) { const m = ns.match(p); if (m) { item = (m[2] || m[1]); break; } }
   if (!item) {
-    const svcs = [/[\u4e00-\u9fa5]*服务费/,/[\u4e00-\u9fa5]*服务/,/[\u4e00-\u9fa5]*运输/,/住宿费?/,/餐饮/,/办公用品/,/[\u4e00-\u9fa5]*材料/,/工程款?/,/[\u4e00-\u9fa5]*租赁/,/[\u4e00-\u9fa5]*维修/,/电信服务/,/收派服务/,/收寄服务/,/轮渡费?/,/代订机票/,/汽油|柴油/,/时租/,/保温套/,/网线|交换器/,/印章/,/花椒|酱油|醋|油/];
-    for (const p of svcs) { const m = c.match(p); if (m) { item = m[0]; break; } }
+    const svcs = [/施工费/,/工程款/,/服务费/,/运输费/,/住宿费/,/餐饮费/,/办公用品/,/材料费/,/租赁费/,/维修费/,/电信服务/,/收派服务/,/收寄服务/,/收派费/,/轮渡费/,/代订机票/,/代订[机火]票/,/汽油|柴油/,/时租/,/保温套/,/网线/,/交换器/,/印章/,/花椒|酱油|醋/,/基础电信服务/,/增值电信服务/,/收寄服务/,/收派服务/,/建筑服务/,/住宿服务/,/餐饮服务/,/交通运输服务/,/现代服务/,/生活服务/,/鉴证咨询服务/,/信息技术服务/,/物流辅助服务/,/股合板/,/收派服务费/,/收寄服务费/,/收派费/,/油漆/,/水泥/];
+    for (const p of svcs) { const m = ns.match(p); if (m) { item = m[0]; break; } }
+  }
+  if (!item) {
+    for (const sl of slines) {
+      if (/[*＊]/.test(sl)) {
+        const m = sl.match(/[*＊]([^*＊\d]+)/);
+        if (m) { item = m[1].replace(/[\u4e00-\u9fa5]+服务/, s => s); break; }
+      }
+    }
   }
 
   let amount = '';
-  const ap = [
-    /价税合计[（(]大写[）)][^￥¥]*[￥¥]\s*([\d,]+\.?\d*)/,
-    /价税合计[^￥¥\d]{0,20}[￥¥]\s*([\d,]+\.?\d*)/,
-    /小写[）)][：:]?\s*[￥¥]?\s*([\d,]+\.?\d*)/,
-    /合\s*计[^￥¥\d]{0,10}[￥¥]\s*([\d,]+\.?\d*)/,
-    /金\s*额[^￥¥\d]{0,10}[￥¥]?\s*([\d,]+\.?\d+)/
+  const apm = [
+    /价税合计[（(]大写[）)][^￥¥\d]*[￥¥]([\d,]+\.?\d*)/,
+    /[（(]小写[）)][：:]?[￥¥]([\d,]+\.?\d*)/,
+    /小写[）)][：:]?[￥¥]([\d,]+\.?\d*)/,
+    /价税合计[^￥¥\d]{0,30}[￥¥]([\d,]+\.?\d*)/,
+    /合计[^￥¥\d]{0,15}[￥¥]([\d,]+\.?\d*)/,
+    /[￥¥]([\d,]+\.?\d{2})/
   ];
-  for (const p of ap) { const m = c.match(p); if (m) { amount = m[1].replace(/,/g, ''); break; } }
+  for (const p of apm) { const m = ns.match(p); if (m) { amount = m[1].replace(/,/g, ''); break; } }
+  if (!amount) {
+    const m = c.match(/[￥¥]\s*([\d,]+\.\d{2})/g);
+    if (m && m.length) {
+      const nums = m.map(s => parseFloat(s.replace(/[￥¥,\s]/g, ''))).filter(n => !isNaN(n));
+      if (nums.length) amount = String(Math.max(...nums));
+    }
+  }
 
   let tax = '';
-  const tp = [
-    /税\s*额[^￥¥\d]{0,10}[￥¥]?\s*([\d,]+\.?\d+)/,
-    /税\s*额\s*[\u4e00-\u9fa5]*\s*[￥¥]?\s*([\d,]+\.?\d+)/
+  const tpm = [
+    /税额[：:]?[￥¥]?([\d,]+\.?\d+)/,
+    /税额[^\d]{0,5}([\d,]+\.?\d{2})/
   ];
-  for (const p of tp) { const m = c.match(p); if (m && m[1] !== '0') { tax = m[1].replace(/,/g, ''); break; } }
+  for (const p of tpm) { const m = ns.match(p); if (m && parseFloat(m[1].replace(/,/g,'')) > 0) { tax = m[1].replace(/,/g, ''); break; } }
+  if (!tax && amount) {
+    const allNums = ns.match(/(\d+\.\d{2})/g);
+    if (allNums) {
+      const amtVal = parseFloat(amount);
+      for (const n of allNums) {
+        const v = parseFloat(n);
+        if (v > 0 && v < amtVal && Math.abs(amtVal - v - Math.round((amtVal - v) * 100) / 100) < 0.01) {
+          tax = n; break;
+        }
+      }
+    }
+  }
 
   const dateVal = $dateInput.value;
   let transferDate = '';
