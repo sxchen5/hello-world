@@ -594,6 +594,10 @@ function parseInvoice(text) {
     if (candidates.length) tax = String(candidates[candidates.length - 1]);
   }
   if (tax === '0.00' || tax === '0') tax = '';
+  if (subtotal && tax && amount) {
+    const expected = (parseFloat(subtotal) + parseFloat(tax)).toFixed(2);
+    if (Math.abs(parseFloat(expected) - parseFloat(amount)) > 0.1) amount = expected;
+  }
 
   const dateVal = $dateInput.value;
   let transferDate = '';
