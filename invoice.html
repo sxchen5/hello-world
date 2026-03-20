@@ -248,23 +248,55 @@ function mkProgress(name){
   };
 }
 
-// --- PDF Text Extraction ---
+// --- PDF Text Extraction (multiple strategies) ---
 async function extractPdfText(page){
   const tc=await page.getTextContent();
   const items=tc.items.filter(it=>it.str&&it.str.trim());
   if(!items.length)return '';
-  items.sort((a,b)=>{
+
+  // Strategy 1: Use hasEOL property from PDF.js
+  let text1='';
+  for(const item of tc.items){
+    text1+=item.str;
+    if(item.hasEOL)text1+='\n';
+    else if(item.str&&!item.str.endsWith(' '))text1+=' ';
+  }
+
+  // Strategy 2: Position-based grouping with adaptive tolerance
+  const pageH=Math.abs(items[0].transform[5])*2||842;
+  const tol=Math.max(3,pageH*0.006);
+  const sorted=[...items].sort((a,b)=>{
     const ay=-a.transform[5],by=-b.transform[5];
-    if(Math.abs(ay-by)<5)return a.transform[4]-b.transform[4];
+    if(Math.abs(ay-by)<tol)return a.transform[4]-b.transform[4];
     return ay-by;
   });
-  const groups=[];let cur=[items[0]];
-  for(let k=1;k<items.length;k++){
-    if(Math.abs(-items[k].transform[5]-(-cur[0].transform[5]))<5)cur.push(items[k]);
-    else{groups.push(cur);cur=[items[k]]}
+  const groups=[];let cur=[sorted[0]];
+  for(let k=1;k<sorted.length;k++){
+    if(Math.abs(-sorted[k].transform[5]-(-cur[0].transform[5]))<tol)cur.push(sorted[k]);
+    else{groups.push(cur);cur=[sorted[k]]}
   }
   groups.push(cur);
-  return groups.map(g=>{g.sort((a,b)=>a.transform[4]-b.transform[4]);return g.map(it=>it.str).join(' ')}).join('\n');
+  let text2=groups.map(g=>{g.sort((a,b)=>a.transform[4]-b.transform[4]);return g.map(it=>it.str).join(' ')}).join('\n');
+
+  // Strategy 3: Simple concatenation with newlines between distant items
+  let text3='';
+  for(let k=0;k<items.length;k++){
+    text3+=items[k].str;
+    if(k<items.length-1){
+      const dy=Math.abs(items[k].transform[5]-items[k+1].transform[5]);
+      text3+=(dy>tol)?'\n':' ';
+    }
+  }
+
+  // Pick the strategy that extracts the most invoice-relevant content
+  function score(t){let s=0;
+    if(/发票号码/.test(t))s+=2;if(/[￥¥][\d,.]+/.test(t))s+=2;if(/[*＊]/.test(t))s+=1;
+    if(/名称/.test(t))s+=1;if(/合\s*计/.test(t))s+=1;if(/价税合计/.test(t))s+=1;
+    if(/年.*月.*日|20\d{2}/.test(t))s+=1;return s;
+  }
+  const candidates=[[text1,score(text1)],[text2,score(text2)],[text3,score(text3)]];
+  candidates.sort((a,b)=>b[1]-a[1]);
+  return candidates[0][0];
 }
 
 async function processPDF(file,pi){
@@ -333,8 +365,9 @@ function parseInvoice(text){
   }
   if(!invoiceDate){
     for(const line of lines){
-      let m=line.match(/(\d{4})\s+(\d{2})\s+(\d{2})/);
-      if(m&&parseInt(m[1])>=2015&&parseInt(m[1])<=2030){invoiceDate=`${m[1]}/${parseInt(m[2])}/${parseInt(m[3])}`;break}
+      let m=line.match(/(\d{4})\s+(\d{1,2})\s+(\d{1,2})/);
+      if(m&&parseInt(m[1])>=2015&&parseInt(m[1])<=2030&&parseInt(m[2])>=1&&parseInt(m[2])<=12){
+        invoiceDate=`${m[1]}/${parseInt(m[2])}/${parseInt(m[3])}`;break}
     }
   }
   if(!invoiceDate){
@@ -403,11 +436,24 @@ function parseInvoice(text){
     else if(all.length===1)seller=all[0];
   }
 
+  // Handle new format: "买 名称：XXX 售 名称：YYY" on same line
+  if(!seller){
+    for(const sl of slines){
+      const m=sl.match(/售[方]?名称[：:]([\u4e00-\u9fa5（）()\w]{3,50})/);
+      if(m){seller=m[1];break}
+    }
+  }
+  if(!seller){
+    for(const line of lines){
+      const m=line.match(/售\s*名称[：:]\s*([\u4e00-\u9fa5（）()\w]{3,50})/);
+      if(m){seller=m[1];break}
+    }
+  }
   if(!seller){
     const re=new RegExp('([\\u4e00-\\u9fa5（）()]{4,}'+SUFFIX+')');
     const companies=[];
     for(const sl of slines){
-      if(/纳税人|识别号|地址|电话|开户行|账号|购买方|合计|价税|备注|校验|发票|日期|号码/.test(sl))continue;
+      if(/纳税人|识别号|地址|电话|开户行|账号|购买方|合计|价税|备注|校验|发票|日期|号码|统一社会信用|下载次数/.test(sl))continue;
       const m=sl.match(re);if(m)companies.push(m[1]);
     }
     if(companies.length>=2)seller=companies[companies.length-1];
