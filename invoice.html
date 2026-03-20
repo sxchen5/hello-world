@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>发票识别与移交表生成 - 锡彭市政建设（江苏）有限公司</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#1a56db;--primary-light:#3b82f6;--primary-bg:#eff6ff;
+  --bg:#f0f2f5;--surface:#fff;--border:#d1d5db;
+  --text:#1f2937;--text-sec:#6b7280;
+  --success:#059669;--danger:#dc2626;
+  --radius:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
+}
+html{font-size:14px}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;
+}
+.container{max-width:1280px;margin:0 auto;padding:20px}
+
+.header{text-align:center;padding:28px 0 20px}
+.header h1{font-size:1.5rem;font-weight:700;color:var(--primary);margin-bottom:2px}
+.header .subtitle{color:var(--text-sec);font-size:.88rem}
+
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+.card-title{font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title .badge{font-size:.75rem;font-weight:400;color:var(--text-sec);margin-left:auto}
+
+.form-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.form-group{display:flex;align-items:center;gap:8px}
+.form-group label{font-weight:500;white-space:nowrap;color:var(--text-sec);font-size:.88rem}
+.form-group input{
+  padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);
+  font-size:.88rem;outline:none;transition:border-color .2s;width:140px;
+}
+.form-group input:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+
+.upload-area{
+  border:2px dashed var(--border);border-radius:var(--radius);padding:36px 20px;
+  text-align:center;cursor:pointer;transition:all .3s;background:var(--primary-bg);position:relative;
+}
+.upload-area:hover,.upload-area.dragover{border-color:var(--primary-light);background:#dbeafe}
+.upload-area .upload-icon{font-size:2.8rem;margin-bottom:10px;display:block}
+.upload-area .upload-text{font-size:1rem;font-weight:500;margin-bottom:4px}
+.upload-area .upload-hint{color:var(--text-sec);font-size:.82rem}
+.upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+.progress-container{margin-top:16px}
+.progress-item{
+  margin-bottom:10px;padding:10px 14px;background:#f9fafb;
+  border-radius:var(--radius);border:1px solid #e5e7eb;
+}
+.progress-item .phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.progress-item .fname{font-weight:500;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.progress-item .pstatus{font-size:.78rem;color:var(--text-sec)}
+.progress-item .pstatus.done{color:var(--success)}
+.progress-item .pstatus.error{color:var(--danger)}
+.pbar{height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.pbar .fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:3px;transition:width .3s;width:0%}
+
+.table-wrapper{overflow-x:auto;margin-top:4px;max-height:60vh;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:1000px}
+thead{position:sticky;top:0;z-index:2}
+thead th{
+  background:#f3f4f6;padding:8px 4px;text-align:center;font-weight:600;
+  border:1px solid var(--border);white-space:nowrap;
+}
+tbody td{padding:2px;border:1px solid var(--border);text-align:center;vertical-align:middle}
+tbody tr:nth-child(even){background:#fafbfc}
+tbody tr:hover{background:#f0f7ff}
+tbody td.seq{width:36px;color:var(--text-sec);font-weight:500;padding:4px}
+tbody td input{
+  width:100%;padding:4px 5px;border:1px solid transparent;border-radius:3px;
+  font-size:.82rem;text-align:center;background:transparent;outline:none;transition:all .2s;
+}
+tbody td input:hover{border-color:#e5e7eb}
+tbody td input:focus{border-color:var(--primary-light);background:var(--surface);box-shadow:0 0 0 2px rgba(59,130,246,.1)}
+tbody td input.wide{min-width:140px}
+tbody td select{
+  width:100%;padding:4px 2px;border:1px solid transparent;border-radius:3px;
+  font-size:.82rem;text-align:center;background:transparent;outline:none;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+tbody td select:focus{border-color:var(--primary-light);background:var(--surface)}
+
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;
+  border-radius:var(--radius);font-size:.88rem;font-weight:500;cursor:pointer;transition:all .2s;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:#1e40af}
+.btn-primary:disabled{background:#93c5fd;cursor:not-allowed}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#047857}
+.btn-success:disabled{background:#6ee7b7;cursor:not-allowed}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:#f9fafb;border-color:#9ca3af}
+.btn-sm{padding:4px 10px;font-size:.78rem}
+.btn-del{background:transparent;color:var(--danger);padding:4px 8px;font-size:.78rem;border:1px solid transparent}
+.btn-del:hover{background:#fef2f2;border-color:#fecaca}
+
+.actions{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;align-items:center}
+
+.empty-state{text-align:center;padding:36px 20px;color:var(--text-sec)}
+.empty-state .eicon{font-size:2.2rem;margin-bottom:8px;display:block;opacity:.5}
+
+.toast{
+  position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:var(--radius);
+  color:#fff;font-size:.88rem;z-index:9999;transform:translateX(120%);transition:transform .3s;
+  box-shadow:var(--shadow-lg);
+}
+.toast.show{transform:translateX(0)}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+.toast.info{background:var(--primary)}
+
+.ocr-text-toggle{
+  margin-top:8px;font-size:.78rem;color:var(--primary);cursor:pointer;
+  display:inline-block;user-select:none;
+}
+.ocr-text-toggle:hover{text-decoration:underline}
+.ocr-text-box{
+  display:none;margin-top:6px;padding:10px;background:#f9fafb;border:1px solid #e5e7eb;
+  border-radius:var(--radius);font-size:.75rem;color:var(--text-sec);
+  white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;
+  font-family:'Courier New',monospace;
+}
+.ocr-text-box.visible{display:block}
+
+@media(max-width:640px){
+  .container{padding:12px}
+  .header h1{font-size:1.15rem}
+  .form-row{flex-direction:column;gap:8px}
+  .form-group{flex:1}
+  .form-group input{width:100%;flex:1}
+  .upload-area{padding:24px 16px}
+  .actions{flex-direction:column}
+  .btn{justify-content:center;width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>锡彭市政建设（江苏）有限公司</h1>
+    <div class="subtitle">发票识别与移交表生成系统</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 基本信息</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>编号：</label>
+        <input type="text" id="docNumber" placeholder="请输入编号">
+      </div>
+      <div class="form-group">
+        <label>移交日期：</label>
+        <input type="date" id="defaultTransferDate">
+      </div>
+      <div class="form-group">
+        <label>移交人：</label>
+        <input type="text" id="transferPerson" placeholder="移交人姓名">
+      </div>
+      <div class="form-group">
+        <label>接收人：</label>
+        <input type="text" id="receiverPerson" placeholder="接收人姓名">
+      </div>
+      <div class="form-group">
+        <label>监督人：</label>
+        <input type="text" id="supervisorPerson" placeholder="监督人姓名">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📄 上传发票</div>
+    <div class="upload-area" id="uploadArea">
+      <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.bmp,.tiff,.tif,.webp">
+      <span class="upload-icon">📁</span>
+      <div class="upload-text">拖拽文件到此处，或点击选择文件</div>
+      <div class="upload-hint">支持 PDF、JPG、PNG 等格式，可同时上传多个文件</div>
+    </div>
+    <div class="progress-container" id="progressContainer"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      📊 发票数据
+      <span class="badge" id="rowCount"></span>
+    </div>
+    <div id="tableArea">
+      <div class="empty-state" id="emptyState">
+        <span class="eicon">📭</span>
+        <div>暂无数据，请上传发票文件或手动添加</div>
+      </div>
+    </div>
+    <div class="actions" id="tableActions" style="display:none">
+      <button class="btn btn-outline btn-sm" onclick="addEmptyRow()">＋ 添加空行</button>
+      <button class="btn btn-outline btn-sm" onclick="applyCommonFields()">应用基本信息到所有行</button>
+      <span style="flex:1"></span>
+      <button class="btn btn-del btn-sm" onclick="clearAllRows()">清空全部</button>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center;padding:24px">
+    <button class="btn btn-success" id="exportBtn" onclick="exportExcel()" disabled style="padding:12px 36px;font-size:1rem">
+      📥 导出 Excel 表格
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const state = { rows: [], worker: null, processing: false };
+
+const $file = document.getElementById('fileInput');
+const $upload = document.getElementById('uploadArea');
+const $progress = document.getElementById('progressContainer');
+const $tableArea = document.getElementById('tableArea');
+const $empty = document.getElementById('emptyState');
+const $actions = document.getElementById('tableActions');
+const $exportBtn = document.getElementById('exportBtn');
+const $rowCount = document.getElementById('rowCount');
+const $dateInput = document.getElementById('defaultTransferDate');
+
+const today = new Date();
+$dateInput.value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+$upload.addEventListener('dragover', e => { e.preventDefault(); $upload.classList.add('dragover'); });
+$upload.addEventListener('dragleave', () => $upload.classList.remove('dragover'));
+$upload.addEventListener('drop', e => {
+  e.preventDefault();
+  $upload.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
+$file.addEventListener('change', e => {
+  if (e.target.files.length) handleFiles(e.target.files);
+  e.target.value = '';
+});
+
+async function getWorker(progressCb) {
+  if (!state.worker) {
+    state.worker = await Tesseract.createWorker('chi_sim+eng', 1, {
+      logger: m => { if (progressCb && m.progress !== undefined) progressCb(m.status, m.progress); }
+    });
+  }
+  return state.worker;
+}
+
+async function handleFiles(fileList) {
+  if (state.processing) { showToast('正在处理中，请稍候', 'info'); return; }
+  state.processing = true;
+  const files = Array.from(fileList).filter(f =>
+    f.type === 'application/pdf' || f.type.startsWith('image/')
+  );
+  if (!files.length) { showToast('未选择有效文件', 'error'); state.processing = false; return; }
+
+  for (const file of files) {
+    const pi = mkProgress(file.name);
+    $progress.appendChild(pi.el);
+    try {
+      if (file.type === 'application/pdf') await processPDF(file, pi);
+      else await processImage(file, pi);
+      pi.done();
+    } catch (err) {
+      console.error(err);
+      pi.fail(err.message);
+    }
+  }
+  state.processing = false;
+  showToast(`处理完成，共识别 ${state.rows.length} 条`, 'success');
+}
+
+function mkProgress(name) {
+  const el = document.createElement('div');
+  el.className = 'progress-item';
+  el.innerHTML = `<div class="phead"><span class="fname">${esc(name)}</span><span class="pstatus">准备中...</span></div><div class="pbar"><div class="fill"></div></div>`;
+  const fill = el.querySelector('.fill');
+  const st = el.querySelector('.pstatus');
+  return {
+    el,
+    p(pct) { fill.style.width = Math.min(100, Math.round(pct)) + '%'; },
+    s(txt) { st.textContent = txt; st.className = 'pstatus'; },
+    done() { st.textContent = '✓ 完成'; st.className = 'pstatus done'; fill.style.width = '100%'; },
+    fail(msg) { st.textContent = '✗ ' + msg; st.className = 'pstatus error'; },
+    addOcrText(text) {
+      const toggle = document.createElement('span');
+      toggle.className = 'ocr-text-toggle';
+      toggle.textContent = '▶ 查看识别原文';
+      const box = document.createElement('div');
+      box.className = 'ocr-text-box';
+      box.textContent = text;
+      toggle.onclick = () => {
+        const vis = box.classList.toggle('visible');
+        toggle.textContent = vis ? '▼ 收起识别原文' : '▶ 查看识别原文';
+      };
+      el.appendChild(toggle);
+      el.appendChild(box);
+    }
+  };
+}
+
+async function processPDF(file, pi) {
+  pi.s('解析 PDF...');
+  pi.p(5);
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const total = pdf.numPages;
+
+  for (let i = 1; i <= total; i++) {
+    pi.s(`处理第 ${i}/${total} 页...`);
+    const page = await pdf.getPage(i);
+    let text = '';
+
+    try {
+      const tc = await page.getTextContent();
+      text = tc.items.map(t => t.str).join(' ');
+    } catch (_) {}
+
+    if (text.replace(/\s/g, '').length < 30) {
+      pi.s(`第 ${i}/${total} 页 OCR 识别中...`);
+      const vp = page.getViewport({ scale: 2.5 });
+      const cvs = document.createElement('canvas');
+      cvs.width = vp.width; cvs.height = vp.height;
+      await page.render({ canvasContext: cvs.getContext('2d'), viewport: vp }).promise;
+      const w = await getWorker((status, prog) => {
+        pi.s(`第 ${i}/${total} 页: ${trStatus(status)}`);
+        pi.p(5 + ((i - 1) / total) * 90 + (90 / total) * prog);
+      });
+      const res = await w.recognize(cvs);
+      text = res.data.text;
+    }
+
+    pi.p(5 + (i / total) * 90);
+    pi.addOcrText(text);
+    if (text.trim()) {
+      state.rows.push(parseInvoice(text));
+      renderTable();
+    }
+  }
+}
+
+async function processImage(file, pi) {
+  pi.s('OCR 识别中...');
+  pi.p(5);
+  const url = URL.createObjectURL(file);
+  const w = await getWorker((status, prog) => {
+    pi.s(trStatus(status));
+    pi.p(5 + prog * 90);
+  });
+  const res = await w.recognize(url);
+  URL.revokeObjectURL(url);
+  pi.p(95);
+  pi.addOcrText(res.data.text);
+  if (res.data.text.trim()) {
+    state.rows.push(parseInvoice(res.data.text));
+    renderTable();
+  }
+}
+
+function trStatus(s) {
+  const m = {
+    'loading tesseract core': '加载 OCR 引擎...',
+    'initializing tesseract': '初始化...',
+    'loading language traineddata': '加载中文语言包...',
+    'initializing api': '初始化接口...',
+    'recognizing text': '正在识别文字...',
+  };
+  return m[s] || s;
+}
+
+function parseInvoice(text) {
+  const c = text.replace(/\s+/g, ' ').trim();
+  const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const ns = c.replace(/\s/g, '');
+  const slines = lines.map(l => l.replace(/\s/g, ''));
+
+  let invoiceType = '电子普票';
+  if (/增值税电子专用发票|电子专票|专用发票/.test(ns)) invoiceType = '电子专票';
+  else if (/铁路电子客票|铁路/.test(ns)) invoiceType = '发票（铁路电子客票）';
+  else if (/机票|航空运输电子客票|行程单/.test(ns)) invoiceType = '电子行程单';
+  else if (/通行费/.test(ns)) invoiceType = '通行费发票';
+  else if (/客运|汽车票/.test(ns)) invoiceType = '客运发票';
+  else if (/增值税普通发票|电子普通发票|普通发票/.test(ns)) invoiceType = '电子普票';
+
+  let invoiceDate = '';
+  let dm = ns.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  if (!dm) dm = c.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  if (dm) invoiceDate = `${dm[1]}/${dm[2]}/${dm[3]}`;
+  else { dm = ns.match(/开票日期[：:]*(\d{4}[-/]\d{1,2}[-/]\d{1,2})/); if (dm) invoiceDate = dm[1].replace(/-/g, '/'); }
+
+  let invoiceNumber = '';
+  let nm = ns.match(/发票号码[：:No.]*(\d{8,20})/);
+  if (nm) invoiceNumber = nm[1];
+  else { nm = ns.match(/号码[：:No.]*(\d{8,20})/); if (nm) invoiceNumber = nm[1]; }
+
+  let seller = '';
+  const smp = [
+    /销售方[，,]?名称[：:]([\u4e00-\u9fa5（）()]+(?:公司|集团|单位|商行|事务所|中心))/,
+    /销售方[，,]?名称[：:]([\u4e00-\u9fa5（）()]{4,40})/,
+    /销方[，,]?名称[：:]([\u4e00-\u9fa5（）()]+)/,
+    /收款单位[：:]([\u4e00-\u9fa5（）()]+)/
+  ];
+  for (const p of smp) { const m = ns.match(p); if (m) { seller = m[1]; break; } }
+  if (!seller) {
+    for (let i = 0; i < slines.length; i++) {
+      if (/销售方|销方/.test(slines[i])) {
+        for (let j = i; j < Math.min(i + 6, slines.length); j++) {
+          const m = slines[j].match(/名称[：:]([\u4e00-\u9fa5（）()\w]+)/);
+          if (m) { seller = m[1]; break; }
+        }
+        if (seller) break;
+        const m2 = slines[i].match(/销售方[，,]?([\u4e00-\u9fa5（）()]+(?:公司|商行))/);
+        if (m2) { seller = m2[1]; break; }
+      }
+    }
+  }
+  if (!seller) {
+    for (const sl of slines) {
+      const m = sl.match(/名称[：:]([\u4e00-\u9fa5（）()]{4,}(?:公司|集团|单位|商行|中心))/);
+      if (m && !/购买方|购方/.test(sl)) { seller = m[1]; break; }
+    }
+  }
+
+  let item = '';
+  const ipm = [
+    /[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，]+)/,
+    /[*＊]([\u4e00-\u9fa5]+)[*＊]/
+  ];
+  for (const p of ipm) { const m = ns.match(p); if (m) { item = (m[2] || m[1]); break; } }
+  if (!item) {
+    const svcs = [/施工费/,/工程款/,/服务费/,/运输费/,/住宿费/,/餐饮费/,/办公用品/,/材料费/,/租赁费/,/维修费/,/电信服务/,/收派服务/,/收寄服务/,/收派费/,/轮渡费/,/代订机票/,/代订[机火]票/,/汽油|柴油/,/时租/,/保温套/,/网线/,/交换器/,/印章/,/花椒|酱油|醋/,/基础电信服务/,/增值电信服务/,/收寄服务/,/收派服务/,/建筑服务/,/住宿服务/,/餐饮服务/,/交通运输服务/,/现代服务/,/生活服务/,/鉴证咨询服务/,/信息技术服务/,/物流辅助服务/,/股合板/,/收派服务费/,/收寄服务费/,/收派费/,/油漆/,/水泥/];
+    for (const p of svcs) { const m = ns.match(p); if (m) { item = m[0]; break; } }
+  }
+  if (!item) {
+    for (const sl of slines) {
+      if (/[*＊]/.test(sl)) {
+        const m = sl.match(/[*＊]([^*＊\d]+)/);
+        if (m) { item = m[1].replace(/[\u4e00-\u9fa5]+服务/, s => s); break; }
+      }
+    }
+  }
+
+  let amount = '';
+  const apm = [
+    /价税合计[（(]大写[）)][^￥¥\d]*[￥¥]([\d,]+\.?\d*)/,
+    /[（(]小写[）)][：:]?[￥¥]([\d,]+\.?\d*)/,
+    /小写[）)][：:]?[￥¥]([\d,]+\.?\d*)/,
+    /价税合计[^￥¥\d]{0,30}[￥¥]([\d,]+\.?\d*)/,
+    /合计[^￥¥\d]{0,15}[￥¥]([\d,]+\.?\d*)/,
+    /[￥¥]([\d,]+\.?\d{2})/
+  ];
+  for (const p of apm) { const m = ns.match(p); if (m) { amount = m[1].replace(/,/g, ''); break; } }
+  if (!amount) {
+    const m = c.match(/[￥¥]\s*([\d,]+\.\d{2})/g);
+    if (m && m.length) {
+      const nums = m.map(s => parseFloat(s.replace(/[￥¥,\s]/g, ''))).filter(n => !isNaN(n));
+      if (nums.length) amount = String(Math.max(...nums));
+    }
+  }
+
+  let tax = '';
+  const taxFromPct = c.match(/\d+%\d?\s+([\d,]+\.\d{2})/);
+  if (taxFromPct) tax = taxFromPct[1].replace(/,/g, '');
+  if (!tax) {
+    const taxFromPct2 = ns.match(/\d+%([\d,]+\.\d{2})/);
+    if (taxFromPct2 && amount) {
+      const numStr = taxFromPct2[1];
+      const amtVal = parseFloat(amount);
+      const rate = parseInt(ns.match(/(\d+)%/)?.[1] || '0');
+      for (let i = 0; i <= Math.min(2, numStr.length - 4); i++) {
+        const cand = parseFloat(numStr.substring(i));
+        if (cand > 0 && cand < amtVal) {
+          const expRate = (cand / (amtVal - cand)) * 100;
+          if (rate > 0 && Math.abs(expRate - rate) < 3) { tax = numStr.substring(i); break; }
+        }
+      }
+      if (!tax) {
+        const cand = parseFloat(numStr);
+        if (cand > 0 && cand < amtVal * 0.3) tax = numStr;
+      }
+    }
+  }
+  if (!tax) {
+    const tpm = [/税额[：:][￥¥]?([\d,]+\.?\d+)/, /税额合计[：:]?[￥¥]?([\d,]+\.?\d+)/];
+    for (const p of tpm) { const m = ns.match(p); if (m && parseFloat(m[1].replace(/,/g,'')) > 0) { tax = m[1].replace(/,/g, ''); break; } }
+  }
+  if (!tax && amount) {
+    const allNums = c.match(/\s([\d,]+\.\d{2})\s/g);
+    if (allNums) {
+      const amtVal = parseFloat(amount);
+      const candidates = allNums.map(n => parseFloat(n.trim().replace(/,/g, ''))).filter(v => v > 0 && v < amtVal * 0.3);
+      if (candidates.length) tax = String(candidates[candidates.length - 1]);
+    }
+  }
+
+  const dateVal = $dateInput.value;
+  let transferDate = '';
+  if (dateVal) {
+    const parts = dateVal.split('-');
+    transferDate = `${parts[0]}/${parseInt(parts[1])}/${parseInt(parts[2])}`;
+  }
+
+  return {
+    invoiceType, transferDate, invoiceDate, invoiceNumber,
+    seller, item, amount, tax,
+    transferPerson: document.getElementById('transferPerson').value,
+    receiver: document.getElementById('receiverPerson').value,
+    supervisor: document.getElementById('supervisorPerson').value,
+    remark: ''
+  };
+}
+
+const FIELDS = [
+  { key: 'invoiceType', label: '票据类型', type: 'select',
+    options: ['电子普票','电子专票','纸质普票','纸质专票','发票（铁路电子客票）','电子行程单','客运发票','通行费发票','其他'] },
+  { key: 'transferDate', label: '移交日期' },
+  { key: 'invoiceDate', label: '开票日期' },
+  { key: 'invoiceNumber', label: '票据号码' },
+  { key: 'seller', label: '开票单位', wide: true },
+  { key: 'item', label: '开票项目' },
+  { key: 'amount', label: '开票金额' },
+  { key: 'tax', label: '税额' },
+  { key: 'transferPerson', label: '移交人' },
+  { key: 'receiver', label: '接收人' },
+  { key: 'supervisor', label: '监督人' },
+  { key: 'remark', label: '备注' }
+];
+
+function renderTable() {
+  if (!state.rows.length) {
+    $empty.style.display = '';
+    $actions.style.display = 'none';
+    $exportBtn.disabled = true;
+    $rowCount.textContent = '';
+    const tw = $tableArea.querySelector('.table-wrapper');
+    if (tw) tw.remove();
+    return;
+  }
+  $empty.style.display = 'none';
+  $actions.style.display = 'flex';
+  $exportBtn.disabled = false;
+  $rowCount.textContent = `共 ${state.rows.length} 条`;
+
+  let tw = $tableArea.querySelector('.table-wrapper');
+  if (!tw) { tw = document.createElement('div'); tw.className = 'table-wrapper'; $tableArea.appendChild(tw); }
+
+  let h = '<table><thead><tr><th>序号</th>';
+  for (const f of FIELDS) h += `<th>${f.label}</th>`;
+  h += '<th>操作</th></tr></thead><tbody>';
+
+  state.rows.forEach((row, i) => {
+    h += `<tr><td class="seq">${i + 1}</td>`;
+    for (const f of FIELDS) {
+      h += '<td>';
+      if (f.type === 'select') {
+        h += `<select data-r="${i}" data-k="${f.key}" onchange="uc(this)">`;
+        for (const o of f.options) h += `<option${row[f.key] === o ? ' selected' : ''}>${esc(o)}</option>`;
+        h += '</select>';
+      } else {
+        h += `<input type="text" value="${esc(row[f.key] || '')}" data-r="${i}" data-k="${f.key}" onchange="uc(this)"${f.wide ? ' class="wide"' : ''}>`;
+      }
+      h += '</td>';
+    }
+    h += `<td><button class="btn-del" onclick="delRow(${i})">删除</button></td></tr>`;
+  });
+  h += '</tbody></table>';
+  tw.innerHTML = h;
+}
+
+function uc(el) { state.rows[+el.dataset.r][el.dataset.k] = el.value; }
+
+function delRow(i) { state.rows.splice(i, 1); renderTable(); }
+
+function addEmptyRow() {
+  const dateVal = $dateInput.value;
+  let td = '';
+  if (dateVal) { const p = dateVal.split('-'); td = `${p[0]}/${parseInt(p[1])}/${parseInt(p[2])}`; }
+  state.rows.push({
+    invoiceType: '电子普票', transferDate: td, invoiceDate: '', invoiceNumber: '',
+    seller: '', item: '', amount: '', tax: '',
+    transferPerson: document.getElementById('transferPerson').value,
+    receiver: document.getElementById('receiverPerson').value,
+    supervisor: document.getElementById('supervisorPerson').value,
+    remark: ''
+  });
+  renderTable();
+  const tw = $tableArea.querySelector('.table-wrapper');
+  if (tw) tw.scrollTop = tw.scrollHeight;
+}
+
+function applyCommonFields() {
+  const tp = document.getElementById('transferPerson').value;
+  const rc = document.getElementById('receiverPerson').value;
+  const sv = document.getElementById('supervisorPerson').value;
+  const dateVal = $dateInput.value;
+  let td = '';
+  if (dateVal) { const p = dateVal.split('-'); td = `${p[0]}/${parseInt(p[1])}/${parseInt(p[2])}`; }
+  state.rows.forEach(r => {
+    if (tp) r.transferPerson = tp;
+    if (rc) r.receiver = rc;
+    if (sv) r.supervisor = sv;
+    if (td) r.transferDate = td;
+  });
+  renderTable();
+  showToast('已应用基本信息到所有行', 'success');
+}
+
+function clearAllRows() {
+  if (!confirm('确定清空所有数据？')) return;
+  state.rows = [];
+  renderTable();
+}
+
+async function exportExcel() {
+  if (!state.rows.length) { showToast('没有数据可导出', 'error'); return; }
+
+  try {
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('发票移交表');
+
+    const headers = ['序号','票据类型','移交日期','开票日期','票据号码','开票单位','开票项目','开票金额','税额','移交人','接收人','监督人','备注'];
+    const colW = [6, 14, 12, 12, 16, 30, 16, 12, 10, 10, 10, 10, 18];
+    ws.columns = colW.map(w => ({ width: w }));
+
+    const borderThin = { top:{style:'thin'}, bottom:{style:'thin'}, left:{style:'thin'}, right:{style:'thin'} };
+
+    ws.mergeCells('A1', 'K1');
+    const tc = ws.getCell('A1');
+    tc.value = '锡彭市政建设（江苏）有限公司发票移交表';
+    tc.font = { bold: true, size: 16, name: '宋体' };
+    tc.alignment = { horizontal: 'center', vertical: 'middle' };
+    tc.border = borderThin;
+
+    ws.getCell('L1').value = '编号';
+    ws.getCell('L1').font = { size: 10, name: '宋体' };
+    ws.getCell('L1').alignment = { horizontal: 'right', vertical: 'middle' };
+    ws.getCell('L1').border = borderThin;
+
+    const docNum = document.getElementById('docNumber').value || '';
+    ws.getCell('M1').value = docNum;
+    ws.getCell('M1').font = { size: 10, name: '宋体' };
+    ws.getCell('M1').alignment = { horizontal: 'left', vertical: 'middle' };
+    ws.getCell('M1').border = borderThin;
+
+    ws.getRow(1).height = 36;
+
+    const hr = ws.getRow(2);
+    headers.forEach((h, i) => {
+      const cell = hr.getCell(i + 1);
+      cell.value = h;
+      cell.font = { bold: true, size: 10, name: '宋体' };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
+      cell.border = borderThin;
+    });
+    hr.height = 26;
+
+    state.rows.forEach((row, idx) => {
+      const r = ws.getRow(idx + 3);
+      const vals = [
+        idx + 1, row.invoiceType, row.transferDate, row.invoiceDate,
+        row.invoiceNumber, row.seller, row.item,
+        row.amount ? (isNaN(+row.amount) ? row.amount : +row.amount) : '',
+        row.tax ? (isNaN(+row.tax) ? row.tax : +row.tax) : '',
+        row.transferPerson, row.receiver, row.supervisor, row.remark
+      ];
+      vals.forEach((v, i) => {
+        const cell = r.getCell(i + 1);
+        cell.value = v;
+        cell.font = { size: 10, name: '宋体' };
+        cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+        cell.border = borderThin;
+      });
+      r.height = 22;
+    });
+
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const d = new Date();
+    a.download = `发票移交表_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Excel 导出成功！', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('导出失败: ' + err.message, 'error');
+  }
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
