@@ -222,7 +222,8 @@ tbody td select:focus{border-color:var(--primary-light);background:var(--surface
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-const state = { rows: [], worker: null, processing: false };
+const state = { rows: [], worker: null, processing: false, cancelled: false };
+let _progressCb = null;
 
 const $file = document.getElementById('fileInput');
 const $upload = document.getElementById('uploadArea');
@@ -249,37 +250,63 @@ $file.addEventListener('change', e => {
   e.target.value = '';
 });
 
-async function getWorker(progressCb) {
+function errMsg(err) { return (err && err.message) ? err.message : String(err || '未知错误'); }
+
+async function getWorker() {
   if (!state.worker) {
     state.worker = await Tesseract.createWorker('chi_sim+eng', 1, {
-      logger: m => { if (progressCb && m.progress !== undefined) progressCb(m.status, m.progress); }
+      logger: m => { if (_progressCb && m.progress !== undefined) _progressCb(m.status, m.progress); }
     });
   }
   return state.worker;
 }
 
+async function cancelProcessing() {
+  state.cancelled = true;
+  if (state.worker) {
+    try { await state.worker.terminate(); } catch (_) {}
+    state.worker = null;
+  }
+  state.processing = false;
+  showToast('已取消处理', 'info');
+}
+
 async function handleFiles(fileList) {
   if (state.processing) { showToast('正在处理中，请稍候', 'info'); return; }
   state.processing = true;
+  state.cancelled = false;
   const files = Array.from(fileList).filter(f =>
     f.type === 'application/pdf' || f.type.startsWith('image/')
   );
   if (!files.length) { showToast('未选择有效文件', 'error'); state.processing = false; return; }
 
-  for (const file of files) {
-    const pi = mkProgress(file.name);
-    $progress.appendChild(pi.el);
-    try {
-      if (file.type === 'application/pdf') await processPDF(file, pi);
-      else await processImage(file, pi);
-      pi.done();
-    } catch (err) {
-      console.error(err);
-      pi.fail(err.message);
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn btn-del btn-sm';
+  cancelBtn.style.cssText = 'margin-top:10px;display:block;border:1px solid var(--border)';
+  cancelBtn.textContent = '✕ 取消处理';
+  cancelBtn.onclick = cancelProcessing;
+  $progress.appendChild(cancelBtn);
+
+  try {
+    for (const file of files) {
+      if (state.cancelled) break;
+      const pi = mkProgress(file.name);
+      $progress.insertBefore(pi.el, cancelBtn);
+      try {
+        if (file.type === 'application/pdf') await processPDF(file, pi);
+        else await processImage(file, pi);
+        if (!state.cancelled) pi.done();
+      } catch (err) {
+        console.error('处理文件失败:', file.name, err);
+        pi.fail(errMsg(err));
+      }
     }
+  } finally {
+    state.processing = false;
+    _progressCb = null;
+    cancelBtn.remove();
+    if (!state.cancelled) showToast(`处理完成，共 ${state.rows.length} 条`, 'success');
   }
-  state.processing = false;
-  showToast(`处理完成，共识别 ${state.rows.length} 条`, 'success');
 }
 
 function mkProgress(name) {
@@ -293,7 +320,7 @@ function mkProgress(name) {
     p(pct) { fill.style.width = Math.min(100, Math.round(pct)) + '%'; },
     s(txt) { st.textContent = txt; st.className = 'pstatus'; },
     done() { st.textContent = '✓ 完成'; st.className = 'pstatus done'; fill.style.width = '100%'; },
-    fail(msg) { st.textContent = '✗ ' + msg; st.className = 'pstatus error'; },
+    fail(msg) { st.textContent = '✗ ' + (msg || '处理失败'); st.className = 'pstatus error'; },
     addOcrText(text) {
       const toggle = document.createElement('span');
       toggle.className = 'ocr-text-toggle';
@@ -319,13 +346,14 @@ async function processPDF(file, pi) {
   const total = pdf.numPages;
 
   for (let i = 1; i <= total; i++) {
+    if (state.cancelled) return;
     pi.s(`处理第 ${i}/${total} 页...`);
     const page = await pdf.getPage(i);
     let text = '';
 
     try {
       const tc = await page.getTextContent();
-      const items = tc.items.filter(it => it.str.trim());
+      const items = tc.items.filter(it => it.str && it.str.trim());
       if (items.length) {
         items.sort((a, b) => {
           const ay = -a.transform[5], by = -b.transform[5];
@@ -343,18 +371,23 @@ async function processPDF(file, pi) {
           return g.map(it => it.str).join(' ');
         }).join('\n');
       }
-    } catch (_) {}
+    } catch (e) { console.warn('PDF文本提取失败:', e); }
 
     if (text.replace(/\s/g, '').length < 30) {
+      if (state.cancelled) return;
       pi.s(`第 ${i}/${total} 页 OCR 识别中...`);
-      const vp = page.getViewport({ scale: 2.5 });
+      const vp = page.getViewport({ scale: 3.0 });
       const cvs = document.createElement('canvas');
       cvs.width = vp.width; cvs.height = vp.height;
-      await page.render({ canvasContext: cvs.getContext('2d'), viewport: vp }).promise;
-      const w = await getWorker((status, prog) => {
+      const ctx = cvs.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      ctx.filter = 'contrast(1.3)';
+      ctx.drawImage(cvs, 0, 0);
+      _progressCb = (status, prog) => {
         pi.s(`第 ${i}/${total} 页: ${trStatus(status)}`);
         pi.p(5 + ((i - 1) / total) * 90 + (90 / total) * prog);
-      });
+      };
+      const w = await getWorker();
       const res = await w.recognize(cvs);
       text = res.data.text;
     }
@@ -371,18 +404,28 @@ async function processPDF(file, pi) {
 async function processImage(file, pi) {
   pi.s('OCR 识别中...');
   pi.p(5);
+  if (state.cancelled) return;
+
   const url = URL.createObjectURL(file);
-  const w = await getWorker((status, prog) => {
-    pi.s(trStatus(status));
-    pi.p(5 + prog * 90);
-  });
-  const res = await w.recognize(url);
-  URL.revokeObjectURL(url);
-  pi.p(95);
-  pi.addOcrText(res.data.text);
-  if (res.data.text.trim()) {
-    state.rows.push(parseInvoice(res.data.text));
-    renderTable();
+  try {
+    _progressCb = (status, prog) => {
+      pi.s(trStatus(status));
+      pi.p(5 + prog * 90);
+    };
+    const w = await getWorker();
+    if (state.cancelled) { URL.revokeObjectURL(url); return; }
+    const res = await w.recognize(url);
+    URL.revokeObjectURL(url);
+    pi.p(95);
+    const text = (res && res.data && res.data.text) ? res.data.text : '';
+    pi.addOcrText(text);
+    if (text.trim()) {
+      state.rows.push(parseInvoice(text));
+      renderTable();
+    }
+  } catch (err) {
+    URL.revokeObjectURL(url);
+    throw err;
   }
 }
 
@@ -390,7 +433,7 @@ function trStatus(s) {
   const m = {
     'loading tesseract core': '加载 OCR 引擎...',
     'initializing tesseract': '初始化...',
-    'loading language traineddata': '加载中文语言包...',
+    'loading language traineddata': '加载中文语言包（首次约25MB）...',
     'initializing api': '初始化接口...',
     'recognizing text': '正在识别文字...',
   };
@@ -415,19 +458,41 @@ function parseInvoice(text) {
   else if (/增值税普通发票|电子普通发票|普通发票/.test(ns)) invoiceType = '电子普票';
 
   let invoiceDate = '';
-  let dm = ns.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  let dm = null;
+  for (const sl of slines) {
+    dm = sl.match(/开票日期[：:]*(\d{4})年(\d{1,2})月(\d{1,2})日?/);
+    if (dm) break;
+    dm = sl.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+    if (dm) break;
+  }
+  if (!dm) dm = ns.match(/开票日期[：:]*(\d{4})年(\d{1,2})月(\d{1,2})日?/);
+  if (!dm) dm = ns.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
   if (!dm) dm = c.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
   if (dm) invoiceDate = `${dm[1]}/${dm[2]}/${dm[3]}`;
-  else { dm = ns.match(/开票日期[：:]*(\d{4})(\d{2})(\d{2})/); if (dm) invoiceDate = `${dm[1]}/${parseInt(dm[2])}/${parseInt(dm[3])}`; }
+  if (!invoiceDate) { dm = ns.match(/开票日期[：:]*(\d{4})(\d{2})(\d{2})/); if (dm) invoiceDate = `${dm[1]}/${parseInt(dm[2])}/${parseInt(dm[3])}`; }
   if (!invoiceDate) { dm = ns.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/); if (dm) invoiceDate = `${dm[1]}/${dm[2]}/${dm[3]}`; }
+  if (!invoiceDate) {
+    for (const sl of slines) {
+      dm = sl.match(/日期[：:]*(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
+      if (dm) { invoiceDate = `${dm[1]}/${parseInt(dm[2])}/${parseInt(dm[3])}`; break; }
+    }
+  }
 
   // --- 票据号码 ---
   let invoiceNumber = '';
-  for (const sl of slines) {
-    let m = sl.match(/发票号码[：:]*[Nn]?[Oo]?[.:]?(\d{4,20})/);
+  for (const line of lines) {
+    const sl = line.replace(/\s/g, '');
+    let m = sl.match(/发票号码[：:]*(\d{4,20})/);
     if (m) { invoiceNumber = m[1]; break; }
-    m = sl.match(/号码[：:]+(\d{4,20})/);
+    m = sl.match(/票号码[：:]*(\d{4,20})/);
     if (m) { invoiceNumber = m[1]; break; }
+  }
+  if (!invoiceNumber) {
+    for (const line of lines) {
+      const sl = line.replace(/\s/g, '');
+      const m = sl.match(/号码[：:]+(\d{4,20})/);
+      if (m) { invoiceNumber = m[1]; break; }
+    }
   }
   if (!invoiceNumber) {
     const m = ns.match(/发票号码[：:]*(\d{4,20})/);
@@ -436,6 +501,14 @@ function parseInvoice(text) {
   if (!invoiceNumber) {
     const m = ns.match(/号码[：:]+(\d{4,20})/);
     if (m) invoiceNumber = m[1];
+  }
+  if (!invoiceNumber) {
+    for (const line of lines) {
+      if (/号\s*码/i.test(line)) {
+        const m = line.match(/(\d{6,20})/);
+        if (m) { invoiceNumber = m[1]; break; }
+      }
+    }
   }
 
   // --- 开票单位 (销售方/收款方) ---
@@ -492,24 +565,42 @@ function parseInvoice(text) {
 
   // --- 开票项目 ---
   let item = '';
-  const ipm = [
-    /[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，,]+)/,
-    /[*＊]([\u4e00-\u9fa5]+)[*＊]/
-  ];
-  for (const p of ipm) { const m = ns.match(p); if (m) { item = (m[2] || m[1]); break; } }
+  for (const line of lines) {
+    const sl = line.replace(/\s/g, '');
+    const m = sl.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，,]+)/);
+    if (m) { item = m[2]; break; }
+  }
   if (!item) {
-    for (const sl of slines) {
+    for (const line of lines) {
+      const sl = line.replace(/\s/g, '');
       if (/[*＊]/.test(sl)) {
-        const m = sl.match(/[*＊]([^*＊\d]{1,})[*＊]([^*＊\d]+)/);
-        if (m) { item = m[2]; break; }
-        const m2 = sl.match(/[*＊]([^*＊\d]+)/);
-        if (m2 && m2[1].length >= 2) { item = m2[1]; break; }
+        const m2 = sl.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]/);
+        if (m2) { item = m2[1]; break; }
+        const m3 = sl.match(/[*＊]([\u4e00-\u9fa5]{2,})/);
+        if (m3) { item = m3[1]; break; }
       }
     }
   }
   if (!item) {
-    const svcs = [/收派服务费?/,/收寄服务费?/,/电信服务/,/基础电信服务/,/增值电信服务/,/建筑服务/,/住宿服务/,/餐饮服务/,/交通运输服务/,/现代服务/,/生活服务/,/信息技术服务/,/物流辅助服务/,/鉴证咨询服务/,/施工费/,/工程款/,/服务费/,/运输费/,/住宿费/,/餐饮费/,/办公用品/,/材料费/,/租赁费/,/维修费/,/代订[机火]票/,/代订机票/,/轮渡费?/,/汽油|柴油/,/时租/,/保温套/,/网线/,/交换器|分路器/,/印章|印戳/,/花椒|酱油|醋|油/,/股合板/,/胶合板/,/油漆/,/水泥/,/钢[材筋管]/,/沙石|砂石/,/混凝土/,/收派服务/,/物流服务/,/快递服务/,/货运/];
+    const m = ns.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]([\u4e00-\u9fa5、，,]+)/);
+    if (m) item = m[2];
+  }
+  if (!item) {
+    const m = ns.match(/[*＊]([\u4e00-\u9fa5]+)[*＊]/);
+    if (m) item = m[1];
+  }
+  if (!item) {
+    const svcs = [/收派服务费/,/收寄服务费/,/收派服务/,/收寄服务/,/电信服务/,/基础电信服务/,/增值电信服务/,/建筑服务/,/住宿服务/,/餐饮服务/,/交通运输服务/,/信息技术服务/,/物流辅助服务/,/鉴证咨询服务/,/现代服务/,/生活服务/,/施工费/,/工程[款费]/,/咨询费/,/设计费/,/监理费/,/劳务费/,/加工费/,/检测费/,/安装费/,/运输费/,/住宿费/,/餐饮费/,/办公用品/,/材料费/,/租赁费/,/维修费/,/修理费/,/物业费/,/水电费/,/停车费/,/过路费/,/通行费/,/代订[机火]票/,/轮渡费/,/汽油/,/柴油/,/时租/,/保温套/,/网线/,/交换[器机]/,/分路器/,/印章/,/印戳/,/胶合板/,/股合板/,/油漆/,/水泥/,/钢[材筋管]/,/[砂沙]石/,/混凝土/,/快递服务/,/物流服务/,/货运服务/,/广告服务/,/培训费/,/会议费/,/审计费/,/保险费/,/利息/,/手续费/,/中介费/,/评估费/,/测绘费/,/勘察费/,/花椒/,/酱油/,/醋/,/食用油/,/服务费/];
     for (const p of svcs) { const m = ns.match(p); if (m) { item = m[0]; break; } }
+  }
+  if (!item) {
+    for (const line of lines) {
+      const sl = line.replace(/\s/g, '');
+      if (/货物或应税劳务|项目名称/.test(sl)) continue;
+      if (/合计|价税合计|销售方|购买方|名称|纳税人|地址|开户|备注/.test(sl)) continue;
+      const m = sl.match(/^([\u4e00-\u9fa5]{2,8}(?:费|款|服务|用品|材料))[\d￥¥]/);
+      if (m) { item = m[1]; break; }
+    }
   }
 
   // --- 开票金额 (价税合计) ---
