@@ -471,20 +471,36 @@ function parseInvoice(text) {
   }
 
   let tax = '';
-  const taxAfterPct = ns.match(/\d+%\d{0,2}([\d,]+\.\d{2})/);
-  if (taxAfterPct) tax = taxAfterPct[1].replace(/,/g, '');
+  const taxFromPct = c.match(/\d+%\d?\s+([\d,]+\.\d{2})/);
+  if (taxFromPct) tax = taxFromPct[1].replace(/,/g, '');
   if (!tax) {
-    const tpm = [
-      /税额[：:][￥¥]?([\d,]+\.?\d+)/,
-      /税额合计[：:]?[￥¥]?([\d,]+\.?\d+)/
-    ];
+    const taxFromPct2 = ns.match(/\d+%([\d,]+\.\d{2})/);
+    if (taxFromPct2 && amount) {
+      const numStr = taxFromPct2[1];
+      const amtVal = parseFloat(amount);
+      const rate = parseInt(ns.match(/(\d+)%/)?.[1] || '0');
+      for (let i = 0; i <= Math.min(2, numStr.length - 4); i++) {
+        const cand = parseFloat(numStr.substring(i));
+        if (cand > 0 && cand < amtVal) {
+          const expRate = (cand / (amtVal - cand)) * 100;
+          if (rate > 0 && Math.abs(expRate - rate) < 3) { tax = numStr.substring(i); break; }
+        }
+      }
+      if (!tax) {
+        const cand = parseFloat(numStr);
+        if (cand > 0 && cand < amtVal * 0.3) tax = numStr;
+      }
+    }
+  }
+  if (!tax) {
+    const tpm = [/税额[：:][￥¥]?([\d,]+\.?\d+)/, /税额合计[：:]?[￥¥]?([\d,]+\.?\d+)/];
     for (const p of tpm) { const m = ns.match(p); if (m && parseFloat(m[1].replace(/,/g,'')) > 0) { tax = m[1].replace(/,/g, ''); break; } }
   }
   if (!tax && amount) {
-    const allNums = ns.match(/(\d+\.\d{2})/g);
+    const allNums = c.match(/\s([\d,]+\.\d{2})\s/g);
     if (allNums) {
       const amtVal = parseFloat(amount);
-      const candidates = allNums.map(n => parseFloat(n)).filter(v => v > 0 && v < amtVal * 0.3);
+      const candidates = allNums.map(n => parseFloat(n.trim().replace(/,/g, ''))).filter(v => v > 0 && v < amtVal * 0.3);
       if (candidates.length) tax = String(candidates[candidates.length - 1]);
     }
   }
