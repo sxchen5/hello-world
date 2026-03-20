@@ -298,7 +298,7 @@ async function extractPdfText(page){
 async function processPDF(file,pi){
   pi.s('解析 PDF...');pi.p(5);
   const buf=await file.arrayBuffer();
-  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  const pdf=await pdfjsLib.getDocument({data:buf,cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',cMapPacked:true}).promise;
   for(let i=1;i<=pdf.numPages;i++){
     if(state.cancelled)return;
     pi.s(`处理第 ${i}/${pdf.numPages} 页...`);
