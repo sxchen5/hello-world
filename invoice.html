@@ -178,11 +178,7 @@ function loadFileHistory(){
   document.getElementById(id).addEventListener('input',saveForm));
 $dateInput.addEventListener('change',saveForm);
 
-// --- Init ---
-const today=new Date();
-$dateInput.value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-loadForm();loadRows();renderTable();loadFileHistory();
-if(!$dateInput.value)$dateInput.value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+// --- Init runs at end of script (see bottom) ---
 
 // --- Upload ---
 $upload.addEventListener('dragover',e=>{e.preventDefault();$upload.classList.add('dragover')});
@@ -642,6 +638,12 @@ async function exportExcel(){
 
 function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>t.classList.remove('show'),3000)}
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// --- Init (must be after all declarations) ---
+const today=new Date();
+$dateInput.value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+loadForm();loadRows();renderTable();loadFileHistory();
+if(!$dateInput.value)$dateInput.value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 </script>
 </body>
 </html>
